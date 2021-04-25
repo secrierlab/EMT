@@ -1,4 +1,4 @@
-# EMT
+# Quantifying epithelial-to-mesenchymal transitions (EMT) in bulk sequenced cancers
 
 This repository contains code for the evaluation of epithelial-to-mesenchymal transition states in cancer.
 
