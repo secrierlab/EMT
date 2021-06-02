@@ -3,7 +3,9 @@ Guidantonio Malagoli Tagliazucchi, Maria Secrier
 
 UCL Genetics Institute, Department of Genetics,  Evolution and Environment,  University College London,  UK 
 
-![alt text](https://github.com/secrierlab/EMT/blob/main/figrepo.png)
+<p align="center">
+  <img width="500" height="400" src="https://github.com/secrierlab/EMT/blob/main/figrepo.png">
+</p>
 
 # Table of contents
 
