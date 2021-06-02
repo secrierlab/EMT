@@ -1,5 +1,5 @@
-# Genomic events shaping epithelial-to-mesenchymal trajectrories in cancer
-### Guidantonio Malagoli Tagliazucchi, Maria Secrier
+# Genomic events shaping epithelial-to-mesenchymal trajectrories in cancer [under construction]
+### Guidantonio Malagoli Tagliazucchi, Maria Secrier 
 UCL Genetics Institute, Department of Genetics,  Evolution and Environment,  University College London,  UK 
 
 <p align="center">
@@ -32,5 +32,7 @@ This folder contains the pipeline used to identify tissue specifics trajectories
 ## clinical_EMT
 This folder contains the code to perform the characterization of the clinical features related with EMT. The folder contain also the code to analyze pharmacogenomic datasets (GDSC, depmap, POG570)
 
+# Copyright
 
+This code is free and is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY. See the GNU General Public License for more details.
 
