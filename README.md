@@ -1,9 +1,35 @@
-# Epithelial-to-mesenchymal transition (EMT) quantification in bulk sequenced cancers
+# Genomic events shaping epithelial-to-mesenchymal trajectrories in cancer
+Guidantonio Malagoli Tagliazucchi, Maria Secrier
 
-This repository contains code for the evaluation of epithelial-to-mesenchymal transition states in cancer.
+UCL Genetics Institute, Department of Genetics,  Evolution and Environment,  University College London,  UK 
+
+![alt text](GenomicsEventsEMT/figrepo.png)
 
 # Table of contents
 
-# Copyright
+## ReconstructionEMTbulk
+This folder contains the code to reconstruct the EMT trajectory of the bulk RNA-seq data from TCGA
+- **namescript1.R:**
+- **namescript2.R:**
 
-This code is free and is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY. See the GNU General Public License for more details.
+## HMM_macrostates_EMT
+This folder contains the code to perform the segmentation of the EMT trajectory and to identify the macrostates of EMT
+
+
+## extrinsic_hallmarks
+This folder contains the code to quantify the extrinsic hallmarks of EMT
+
+## intrinsic_hallmarks
+This folder contains the code to quantify the intrinsic hallmarks of EMT
+
+## biomarkers_EMT
+This folder contains the pipeline used to identify the biomarkers of EMT
+
+## tissue_specific_trajectories
+This folder contains the pipeline used to identify tissue specifics trajectories in LUAD and BRCA, and the code to define the markers associated with EMT states
+
+## clinical_EMT
+This folder contains the code to perform the characterization of the clinical features related with EMT. The folder contain also the code to analyze pharmacogenomic datasets (GDSC, depmap, POG570)
+
+
+
