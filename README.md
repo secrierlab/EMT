@@ -1,6 +1,5 @@
 # Genomic events shaping epithelial-to-mesenchymal trajectrories in cancer
-Guidantonio Malagoli Tagliazucchi, Maria Secrier
-
+### Guidantonio Malagoli Tagliazucchi, Maria Secrier
 UCL Genetics Institute, Department of Genetics,  Evolution and Environment,  University College London,  UK 
 
 <p align="center">
