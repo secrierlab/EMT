@@ -39,6 +39,13 @@ This folder contains the pipeline used to identify tissue specifics trajectories
 ## clinical_EMT
 This folder contains the code to perform the characterization of the clinical features related with EMT. The folder contain also the code to analyze pharmacogenomic datasets (GDSC, depmap, POG570)
 
+- **endpoints_EMT.R:** Code to run the overall survival analysis and cox proportional hazard models.
+- **run_demographic_table.R:** Create a demographic table and perform other statitics.
+- **integrate_EMT_with_drugs.R:** Integrate the HMM states, EMT scores with data from GDSC
+- **aov_depmap_ml_features.R:** Integrate the HMM states, EMT scores with data from DepMap
+- **knnForPOG_MCF.R.R:** kNN procedure with POG dataset
+- **knnForGDSC_MCF.R:** kNN procedure with GDSC dataset
+
 # Copyright
 
 This code is free and is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY. See the GNU General Public License for more details.
