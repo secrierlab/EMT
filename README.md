@@ -43,6 +43,8 @@ This folder contains the code to perform the characterization of the clinical fe
 - **run_demographic_table.R:** Create a demographic table and perform other statitics.
 - **integrate_EMT_with_drugs.R:** Integrate the HMM states, EMT scores with data from GDSC
 - **aov_depmap_ml_features.R:** Integrate the HMM states, EMT scores with data from DepMap
+- **endpoints_response_to_theraphyApril.R:** Script to create the Kaplan Meier of PFI for significant therapies
+- **CoxPh_model_mutations.R:** Script to find the significant mutations impacting the overall survival of patients
 - **knnForPOG_MCF.R.R:** kNN procedure with POG dataset
 - **knnForGDSC_MCF.R:** kNN procedure with GDSC dataset
 
