@@ -19,6 +19,8 @@ This folder contains the code to perform the segmentation of the EMT trajectory 
  
 ## extrinsic_hallmarks
 This folder contains the code to quantify the extrinsic hallmarks of EMT
+- **run_fibroblast_deconvolution.R:** This is the script used to quantify the levels of fibroblast infiltration. Contains also the code to run the multinomial logistic regression with the fibroblasts signals and the HMM states.
+- **run_tme_deconvolution.R:** This is the script used to quantify the cell components of Tumour Micro Environment (TME). Contains also the code to run the multinomial logistic regression with the TME signals and the HMM states.
 
 ## intrinsic_hallmarks
 This folder contains the code to quantify the intrinsic hallmarks of EMT
