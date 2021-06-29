@@ -47,7 +47,7 @@ This folder contains the code to perform the characterization of the clinical fe
 - **CoxPh_model_mutations.R:** Script to find the significant mutations impacting the overall survival of patients
 - **knnForPOG_MCF.R.R:** kNN procedure with POG dataset
 - **knnForGDSC_MCF.R:** kNN procedure with GDSC dataset
-- **compare_before_after_treatment_TCGA.R:** compare the levels of EMT in samples naive treated (TCGA) and treated (POG)
+- **compare_before_after_treatment_TCGA.R:** compare the levels of EMT of samples naive treated (TCGA) and treated (POG)
 
 # Copyright
 
