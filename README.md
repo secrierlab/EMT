@@ -15,8 +15,8 @@ This folder contains the code to reconstruct the EMT trajectory of the bulk RNA-
 
 ## HMM_macrostates_EMT
 This folder contains the code to perform the segmentation of the EMT trajectory and to identify the macrostates of EMT
-
-
+- **run_hmm.R:** This script contain the code to run the segmentation and perform the identification of the EMT states
+ 
 ## extrinsic_hallmarks
 This folder contains the code to quantify the extrinsic hallmarks of EMT
 
