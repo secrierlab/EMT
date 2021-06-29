@@ -49,7 +49,15 @@ This folder contains the code to perform the characterization of the clinical fe
 - **knnForGDSC_MCF.R:** kNN procedure with GDSC dataset
 - **compare_before_after_treatment_TCGA.R:** compare the levels of EMT of samples naive treated (TCGA) and treated (POG)
 
-# Copyright
+## Validation
+This folder contains the code to perform the validation using external datasets.
+- **validate_biomarkers_with_CCLE_and_METMAP_MUT_v2.R:** Compare the metastatic potential of samples with and without mutations in the biomarkers
+- **validate_biomarkers_with_CCLE_and_METMAP_CNV_v2.R:** Compare the metastatic potential of samples with and without copy number alterations in the biomarkers
+- **CRISPR_validation_MUT.R:** Get the Ceres Scores of the biomarkers associated with mutations and plot heatmaps
+- **CRISPR_validation_CNV.R:** Get the Ceres Scores of the biomarkers associated with copy number alterations and plot heatmaps
+- **validation_Schaller_MUT.R:** This script check if putative biomarkers of EMT with mutations are targets of TFs important for EMT
+- **validation_Schaller_MUT.R:** This script check if putative biomarkers of EMT associated with CNV are targets of TFs important for EMT
 
+# Copyright
 This code is free and is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY. See the GNU General Public License for more details.
 
