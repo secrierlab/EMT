@@ -1,0 +1,13 @@
+run_prepare_matrix_dNdScv_CNVs.R: script to prepare the initial matrix (1)
+
+run_lasso_model_notime.R: run lasso procedure (2) - model -
+
+run_rf_model_notime.R: run random forest procedure (3) - model -
+
+run_compare_multiple_models_v2.R: take the lasso results from LASSO50, LASSO80 and compare with other models (4)
+
+run_explore_res_rf_model_notime.R: take the results from random forest and test different models (5)
+
+run_compare_lasso_with_RF.R: create the venn diagram of lasso and random forest and the three conditions (6)
+
+run_models_common_genes_lasso_rf.R: compare the results between the overlap of lasso and rf (Venn LASSO50 + LASSO80 + RF) (7)

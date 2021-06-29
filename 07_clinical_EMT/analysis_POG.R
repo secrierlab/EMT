@@ -107,7 +107,7 @@ therapy_table<-read.xlsx(xlsxFile = "Table_S2_Treatment.xlsx", sheet = 1)
 # convert the days of therapy in months
 therapy_table$long_treatment<-(therapy_table$Therapy_end_or_biopsy_date-therapy_table$Therapy_start_date)/30
   
-therapy_table2<-unique(therapy_table[,c(1,2,10)])
+therapy_table2<-unique(therapy_table[,c(1,2,7,8,9,10)])
 
 freq_therapies<-data.frame(table(therapy_table2[,2]))
 drugs_to_consider<-freq_therapies[freq_therapies[,2]>=10,1]
@@ -115,6 +115,7 @@ drugs_to_consider<-freq_therapies[freq_therapies[,2]>=10,1]
 therapy_table_to_consider<-therapy_table2[therapy_table2[,2]%in%drugs_to_consider,]
 
 emt_with_dem<-merge(emt_scores_df,dem_table,by.x="Patient_ID",by.y="PATIENT_ID")
+
 
 unique(emt_with_dem$PRIMARY_SITE)
 # "Blood","Brain"
@@ -125,11 +126,91 @@ input_for_chart<-merge(emt_with_dem2,therapy_table_to_consider,by.x="Patient_ID"
 
 input_for_chart$logmonth<-log(input_for_chart$long_treatment+1,2)
 
+# input_for_chart$On_treatment_at_biopsy<-ifelse(input_for_chart$On_treatment_at_biopsy==1,"on_treatment","not_treatment")
+# input_for_chart$On_treatment_at_biopsy<-as.factor(input_for_chart$On_treatment_at_biopsy)
 
-test<-unique(input_for_chart[,c(1:2,18)])
+# get the patient untreated at the enrollement
+# df_pts_before_after_treatment[df_pts_before_after_treatment[,1]%in%30159,]
 
-psm<-ggplot(test, aes(x=EMT_score, y=logmonth))+
-  geom_point()+geom_smooth(method=lm, se = TRUE)+theme_bw()+ylab("months (log2)")+xlab(paste("EMT score"))
+pts_no_treatment<-unique(input_for_chart[which(input_for_chart$On_treatment_at_biopsy%in%0),1])
+df_pts_before_after_treatment<-input_for_chart[which(input_for_chart[,1]%in%pts_no_treatment),]
+
+df_pts_before_after_treatment$On_treatment_at_biopsy<-ifelse(df_pts_before_after_treatment$On_treatment_at_biopsy==1,"after_treatment","before_treatment")
+df_pts_before_after_treatment$On_treatment_at_biopsy<-factor(df_pts_before_after_treatment$On_treatment_at_biopsy,level=c("before_treatment","after_treatment"))
+
+table(df_pts_before_after_treatment[,1],df_pts_before_after_treatment$On_treatment_at_biopsy)
+
+pdf("boxplot_emt_before_after_treatment.pdf")
+
+  p2_sig<-ggplot(df_pts_before_after_treatment,aes(x=On_treatment_at_biopsy, y=EMT_score))+
+    geom_boxplot()+geom_jitter(width=0.1, aes(color = EMT_score))+scale_colour_gradient2(low = "orange2", mid = "grey", high = "darkmagenta", midpoint = 0)+
+    theme(text = element_text(size=8),legend.position="top")+theme_bw()+ ylab("EMT score")
+  p3<-p2_sig+stat_compare_means(comparisons = list(c("after_treatment","before_treatment")),method="wilcox.test")
+  print(p3)
+  
+  list_drugs<-unique(df_pts_before_after_treatment$Drug_name)
+  
+  for(lsds in list_drugs){
+    
+  sub_drug<-df_pts_before_after_treatment[df_pts_before_after_treatment$Drug_name%in%lsds,]
+  
+  p2_sig<-ggplot(sub_drug,aes(x=On_treatment_at_biopsy, y=EMT_score))+
+    geom_boxplot()+geom_jitter(width=0.1, aes(color = EMT_score))+scale_colour_gradient2(low = "orange2", mid = "grey", high = "darkmagenta", midpoint = 0)+
+    theme(text = element_text(size=8),legend.position="top")+theme_bw()+ ylab("EMT score")
+  p3<-p2_sig+stat_compare_means(comparisons = list(c("after_treatment","before_treatment")),method="wilcox.test")
+  print(p3+ggtitle(lsds))
+  
+  }
+
+dev.off()
+
+
+# 
+#  No deprecated
+# 
+
+# pdf("boxplot_emt_before_after_treatmentWithStartAndEndTreatment.pdf")
+# 
+# dfSEtreat<-input_for_chart[,colnames(df_pts_before_after_treatment)%in%c("Patient_ID","Drug_name","EMT_score","Therapy_start_date","Therapy_end_or_biopsy_date")]
+# # in some cases the start and the end of the treatment is the same, I exclude this from the analysis
+# dfSEtreat2<-dfSEtreat[-which(dfSEtreat[,4]==dfSEtreat[,5]),]
+# dfSEtreat2$Therapy_start_date<-"start"
+# dfSEtreat2$Therapy_end_or_biopsy_date<-"end"
+# 
+# 
+# dfSEtreat2_start<-dfSEtreat2[which(dfSEtreat2$Therapy_start_date%in%"start"),-5]
+# colnames(dfSEtreat2_start)[4]<-"time"
+# 
+# dfSEtreat2_end<-dfSEtreat2[which(dfSEtreat2$Therapy_end_or_biopsy_date%in%"end"),-4]
+# colnames(dfSEtreat2_end)[4]<-"time"
+# 
+# dfSEtreat2_final<-rbind(dfSEtreat2_start,dfSEtreat2_end)
+# 
+# dfSEtreat2_final$time<-factor(dfSEtreat2_final$time,level=c("start","end"))
+# 
+# p2_sig<-ggplot(dfSEtreat2_final,aes(x=time, y=EMT_score))+
+#   geom_boxplot()+geom_jitter(width=0.1, aes(color = EMT_score))+scale_colour_gradient2(low = "orange2", mid = "grey", high = "darkmagenta", midpoint = 0)+
+#   theme(text = element_text(size=8),legend.position="top")+theme_bw()+ ylab("EMT score")
+# p3<-p2_sig+stat_compare_means(comparisons = list(c("start","end")),method="wilcox.test")
+# print(p3)
+# 
+# list_drugs<-unique(dfSEtreat2_final$Drug_name)
+# 
+# for(lsds in list_drugs){
+#   
+#   sub_drug<-dfSEtreat2_final[dfSEtreat2_final$Drug_name%in%lsds,]
+#   
+#   p2_sig<-ggplot(sub_drug,aes(x=time, y=EMT_score))+
+#     geom_boxplot()+geom_jitter(width=0.1, aes(color = EMT_score))+scale_colour_gradient2(low = "orange2", mid = "grey", high = "darkmagenta", midpoint = 0)+
+#     theme(text = element_text(size=8),legend.position="top")+theme_bw()+ ylab("EMT score")
+#   p3<-p2_sig+stat_compare_means(comparisons = list(c("start","end")),method="wilcox.test")
+#   print(p3+ggtitle(lsds))
+#   
+# }
+# 
+# dev.off()
+# 
+
 
 
 list_drugs<-unique(input_for_chart$Drug_name)
