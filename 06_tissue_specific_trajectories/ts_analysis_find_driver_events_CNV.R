@@ -103,8 +103,8 @@ list_order<-vector(mode="list",2)
 list_order[[1]]<-c("cluster3","cluster4","cluster5","cluster1","cluster2")
 list_order[[2]]<-c("cluster4","cluster2","cluster1","cluster5","cluster3")
 
-list_pvalue<-c(0.01,0.01)
-thr_minimum<-c(0.10,0.10)
+list_pvalue<-c(0.1,0.1)
+thr_minimum<-c(0.1,0.2)
 
 #
 # Iteration for cancer type
@@ -135,7 +135,7 @@ for(scexp in 1:length(list_input)){
   G_list <- getBM(filters= "ensembl_gene_id", attributes= c("ensembl_gene_id", "hgnc_symbol"),values=cnv_file[,2],mart= mart)
 
   cnv_file2<-merge(G_list,cnv_file,by.x="ensembl_gene_id",by.y="Gene Symbol")[,-c(3:5)]
-  cnv_file3<-cnv_file2[cnv_file2$hgnc_symbol %in% cosmic_genes,]
+  cnv_file3<-cnv_file2[which(cnv_file2$hgnc_symbol %in% cosmic_genes),]
   colnames(cnv_file3)<-unlist(lapply(strsplit(colnames(cnv_file3),split="-"),FUN=function(X){paste(X[1:4],collapse="-")}))
   colnames(cnv_file3)[1:2]<-c("ENSG","gene_symbol")
   
@@ -165,8 +165,23 @@ for(scexp in 1:length(list_input)){
   current_df_event<-list_dep_amp[[events]]
   
   clusters_for_genes_df<-table(current_df_event$clusters,current_df_event$variable)
-  
-  freq_for_genes<-t(apply(clusters_for_genes_df,2,FUN=function(X){X/sum(X)}))
+
+  # remove the common CNV alterations across the clusters
+  clusters_for_genes_df_temp<-clusters_for_genes_df
+  clusters_for_genes_df_temp[clusters_for_genes_df_temp>1]<-1
+
+  idx_genes_in_common<-which(apply(clusters_for_genes_df_temp,2,sum) %in% nrow(clusters_for_genes_df_temp))
+
+  clusters_for_genes_df<-clusters_for_genes_df[,-idx_genes_in_common]
+
+  genes_min_samples<-names(which(apply(clusters_for_genes_df,2,sum)>=10))
+
+  clusters_for_genes_df2<-clusters_for_genes_df[,which(colnames(clusters_for_genes_df)%in%genes_min_samples)]
+
+  ttest_genes<-apply(clusters_for_genes_df2,2,FUN=function(X){t.test(X)$p.value})
+  sig_genes2<-names(ttest_genes[ttest_genes<=0.05])
+
+  freq_for_genes<-t(apply(clusters_for_genes_df2[,colnames(clusters_for_genes_df2)%in%sig_genes2],2,FUN=function(X){X/sum(X)}))
   
   selected_freq_cnv_for_clusters<-apply(freq_for_genes,2,FUN=function(X){names(X[X>thr_min])})
 
@@ -242,19 +257,27 @@ for(scexp in 1:length(list_input)){
   
   }
   
+  #
+  #Warning: use AOVGens only to get the EMT scores - not to define the sig. CNV altered between groups
+  #
+
   resAOV<-AOVGenes(X=current_cnv_df2,genes_for_lme)
   
-  #genes_aov<-p.adjust(resAOV[[1]],"BH")
-  genes_aov<-resAOV[[1]]
+  #NOOO: there are not significant genes in this analysis
+  #genes_aov<-resAOV[[1]]
   
-  genes_aov2<-genes_aov[genes_aov<=current_pvalue]
- 
-  genes_qvalue<-p.adjust(genes_aov2,"BH")
-  
-  genes_aov2<-genes_qvalue[genes_qvalue<=current_pvalue]  
+  # use directly the genes found during the pre-processing
+  genes_aov<-genes_for_lme
 
-  SIGNIFICANT_CNV_GENES[[cnv_events]]<-names(genes_aov2)
+  #genes_aov2<-genes_aov[genes_aov<=current_pvalue]
+ 
+  #genes_qvalue<-p.adjust(genes_aov,"BH")
   
+  #genes_aov2<-genes_qvalue[genes_qvalue<=current_pvalue]  
+
+
+  SIGNIFICANT_CNV_GENES[[cnv_events]]<-genes_aov  
+
   emt_clusters<-resAOV[[2]][,c(1,3,4,5)]
   emt_clusters2<-aggregate(score_emt~clusters+gene, emt_clusters, median)
   emt_clusters2$clusters<-paste("cluster",emt_clusters2$clusters,sep="")
@@ -266,7 +289,8 @@ for(scexp in 1:length(list_input)){
   colnames(matrices_freq2)<-c("genes","clusters","freq_perc")
   
   input_circular_heatmap<-merge(matrices_freq2,emt_clusters2,by.x=c("clusters","genes"),by.y=c("clusters","gene"))
-  input_circular_heatmap2<-input_circular_heatmap[input_circular_heatmap$genes%in%names(genes_aov2),]
+  input_circular_heatmap2<-input_circular_heatmap[input_circular_heatmap$genes%in%genes_aov,]
+
   # Create circular plot for copy number only
   
   input_circular_heatmap2$clusters<-factor(input_circular_heatmap2$clusters,levels=vector_order_to_use)
@@ -275,8 +299,7 @@ for(scexp in 1:length(list_input)){
   
   status<-names(RES_AMP_DEP)[cnv_events]
   
-  output_pdf<-paste("CNV_circular_heatmap_emt.",current_cancer,".",status,".May.pdf",sep="")
-  
+  output_pdf<-paste("CNV_circular_heatmap_emt.",current_cancer,".",status,".June.pdf",sep="") 
   pdf(output_pdf)
   
   if(names(RES_AMP_DEP)[cnv_events]=="amplification"){
@@ -329,8 +352,8 @@ for(scexp in 1:length(list_input)){
   
   setwd("/home/guidantoniomt/pseudospace/explore_cook_sort_pseudotimes/find_drivers_events")
   
-  output_pdf_venn<-paste("CNV_venn_for_clusters",current_cancer,".May.pdf",sep="")
-  output_txt_venn<-paste("CNV_venn_for_clusters",current_cancer,".May.txt",sep="")
+  output_pdf_venn<-paste("CNV_venn_for_clusters",current_cancer,".June.pdf",sep="")
+  output_txt_venn<-paste("CNV_venn_for_clusters",current_cancer,".June.txt",sep="")
   
   pdf(output_pdf_venn)
   

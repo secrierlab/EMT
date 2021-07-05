@@ -61,7 +61,14 @@ for(tum in list_tum){
   }
   
   res_global<-res_global[grep(res_global$gene_name,pattern="^OR",invert=T),]
-    
+   
+  #remove genes in all the states
+  res_global_table<-table(res_global$gene_name,res_global$state)
+
+  genes_in_common_to_exclude<-names(which(rowSums(res_global_table) == ncol(res_global_table)))
+
+  res_global<-res_global[-c(res_global$gene_name%in%genes_in_common_to_exclude),]
+
   results_dndscv<-lapply(split(res_global,f=res_global$state),FUN=function(X){X[,3]})
   
   output_venn<-paste(paste(tum,"dndscv_Cook_states","UpSet",sep="."),".txt",sep="")
@@ -72,8 +79,8 @@ for(tum in list_tum){
   
   #write.table(res_ven,file=output_venn,sep="\t",quote=F,row.names=F)
   
-  gene_list<-intersect(unlist(results_dndscv),genes_degs)
-    
+  gene_list<-setdiff(intersect(unlist(results_dndscv),genes_degs), genes_in_common_to_exclude)
+
   #
   # Prepare the data for the circular charts
   #
@@ -166,7 +173,7 @@ for(tum in list_tum){
   
   merge5$qglobal_cv<- -log(merge5$qglobal_cv+1,10)
    
-  merge5$genes<-factor(merge5$genes,levels=order_degs)
+  merge5$genes<-factor(merge5$genes,levels=setdiff(order_degs,genes_in_common_to_exclude))
 
   output_pdf<-paste(paste("circular_heatmap_mutation_emt_dndscv_Cook_states",tum,sep="."),".SELECTED.pdf",sep="")
  
