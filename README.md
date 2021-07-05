@@ -37,7 +37,8 @@ This folder contains the pipeline used to identify the biomarkers of EMT
 This folder contains the pipeline used to identify tissue specifics trajectories in LUAD and BRCA, and the code to define the markers associated with EMT states
 - **ts_analysis_find_driver_events_CNV.R:** find drivers copy number alteration in LUAD and BRCA
 - **ts_analysis_find_driver_events_MUT.R:** find drivers mutations in LUAD and BRCA
-- 
+- **plot_cook_states_dndscv_Selected.RL:** plot only the relevant mutational events in each EMT state
+
 ## clinical_EMT
 This folder contains the code to perform the characterization of the clinical features related with EMT. The folder contain also the code to analyze pharmacogenomic datasets (GDSC, depmap, POG570)
 
