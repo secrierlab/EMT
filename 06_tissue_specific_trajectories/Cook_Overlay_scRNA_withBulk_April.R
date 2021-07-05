@@ -4,14 +4,14 @@ library(grid)
 library(readxl)
 library(plotrix)
 
-setwd("/home/guidantoniomt/pseudospace/explore_cook_sort_pseudotimes")
+setwd("/data/pseudospace/explore_cook_sort_pseudotimes")
 load("COOK_branched_pseudotime.seurat.RData")
 
-load("/home/guidantoniomt/pseudospace/res_multiple_pseudospace/A549_mapped_seurat_correct_all_timecourse.RData")
+load("/data/pseudospace/res_multiple_pseudospace/A549_mapped_seurat_correct_all_timecourse.RData")
 LUAD_scores_EMT<-df_scores_EMT
 LUAD_mapping<-res_mapping
 
-load("/home/guidantoniomt/pseudospace/res_multiple_pseudospace/MCF7_mapped_seurat_correct_all_timecourse.RData")
+load("/data/pseudospace/res_multiple_pseudospace/MCF7_mapped_seurat_correct_all_timecourse.RData")
 BRCA_scores_EMT<-df_scores_EMT
 BRCA_mapping<-res_mapping
 
@@ -22,11 +22,11 @@ for(i in 1:length(list_cellline)){
 
   if(list_cellline[i]=="A549"){
     
-    clusters_df<-data.frame(read_excel("/home/guidantoniomt/pseudospace/explore_cook_sort_pseudotimes/find_drivers_events/LUAD_groups_for_Lucie.xlsx"))
+    clusters_df<-data.frame(read_excel("/data/pseudospace/explore_cook_sort_pseudotimes/find_drivers_events/LUAD_groups_for_Lucie.xlsx"))
   
   }else{
   
-    clusters_df<-data.frame(read_excel("/home/guidantoniomt/pseudospace/explore_cook_sort_pseudotimes/find_drivers_events/data_for_lucie_BRCA_PRAD_OV.xlsx","BRCA"))
+    clusters_df<-data.frame(read_excel("/data/pseudospace/explore_cook_sort_pseudotimes/find_drivers_events/data_for_lucie_BRCA_PRAD_OV.xlsx","BRCA"))
     
   }
   
@@ -47,7 +47,7 @@ for(i in 1:length(list_cellline)){
   tcga_pca<-cbind(current_tcga_pca[,which(colnames(current_tcga_pca)%in%c("x","y","clusters"))])
   colnames(tcga_pca)<-c("x","y","exp")
   
-  setwd("/home/guidantoniomt/pseudospace/explore_cook_sort_pseudotimes/find_drivers_events")
+  setwd("/data/pseudospace/explore_cook_sort_pseudotimes/find_drivers_events")
   
   # all_data<-rbind(pca_res_cl,tcga_pca)
   # all_data$exp<-as.factor(all_data$exp)

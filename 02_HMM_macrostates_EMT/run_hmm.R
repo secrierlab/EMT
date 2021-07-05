@@ -11,17 +11,17 @@ library(depmixS4)
 library(pheatmap)
 library(ComplexHeatmap)
 
-setwd("/home/guidantoniomt/pseudospace/input_pseudospace")
+setwd("/data/pseudospace/input_pseudospace")
 load("TCGA_matrix_gene_expression_signals_ALLGENES_29_01_2020.RData")
 
 input_file<-c("proj_pseudospace_mcf_mock_mock_Mclust3_with_pemt.txt")
 
-setwd("/home/guidantoniomt/pseudospace")
+setwd("/data/pseudospace")
 pseudospace_input<-read.delim(file="proj_pseudospace_mcf_tgfb_mock_Mclust3_with_pemt.txt")
 
 pseudospace_input_sort<-pseudospace_input[order(pseudospace_input$mock,decreasing=F),]
 
-setwd("/home/guidantoniomt/pseudospace/HMM")
+setwd("/data/pseudospace/HMM")
 markers_genes_read<-read.table(file="EMT_and_pEMT_markers.txt",header=T)
 markers_genes<-markers_genes_read[,1]
 

@@ -6,7 +6,7 @@ library(ggpubr)
 library('biomaRt')
 mart <- useDataset("hsapiens_gene_ensembl", useMart("ensembl"))
 
-setwd("/home/guidantoniomt/pseudospace/ml_for_ppt/cosmic_focal_broad_variants")
+setwd("/data/pseudospace/ml_for_ppt/cosmic_focal_broad_variants")
 
 getFeaturesSS<-function(res_lasso,ss=800){
   
@@ -38,7 +38,7 @@ getCoefSS<-function(res_lasso,features_to_select){
   
 }
 
-setwd("/home/guidantoniomt/pseudospace/ml_for_ppt/cosmic_focal_broad_variants")
+setwd("/data/pseudospace/ml_for_ppt/cosmic_focal_broad_variants")
 
 load("HMM_nstates3_mock.mes.vs.epi.tissue.TRUE.1000.cosmic_arms_focal.RData")
 
@@ -59,24 +59,24 @@ mut_genes_mes_vs_mix_raw<-grep(markers_mes_vs_epi,pattern="dndscv",value=T)
 cnv_markers_mes_vs_mix<-sapply(strsplit(grep(sub(grep(markers_mes_vs_epi,pattern="dndscv",value=T,invert=T),pattern="^X",replacement=""),pattern="focal",value=T),split="_"),"[[",1)
 
 
-cosmic_table<-read.csv(file="/home/guidantoniomt/pseudospace/ml_for_ppt/Census_allMon Aug 17 13_43_26 2020.csv",stringsAsFactors=F)
+cosmic_table<-read.csv(file="/data/pseudospace/ml_for_ppt/Census_allMon Aug 17 13_43_26 2020.csv",stringsAsFactors=F)
 cosmic_genes<-as.character(cosmic_table[,1])
 
 #
 # Read the data for the analysis
 #
 
-load("/home/guidantoniomt/pseudospace/res_multiple_pseudospace/A549_mapped_seurat_correct_all_timecourse.RData")
+load("/data/pseudospace/res_multiple_pseudospace/A549_mapped_seurat_correct_all_timecourse.RData")
 LUAD_scores_EMT<-df_scores_EMT
 
-load("/home/guidantoniomt/pseudospace/res_multiple_pseudospace/MCF7_mapped_seurat_correct_all_timecourse.RData")
+load("/data/pseudospace/res_multiple_pseudospace/MCF7_mapped_seurat_correct_all_timecourse.RData")
 BRCA_scores_EMT<-df_scores_EMT
 
 #
 # Read input files for the analysis
 #
 
-setwd("/home/guidantoniomt/pseudospace/explore_cook_sort_pseudotimes/find_drivers_events")
+setwd("/data/pseudospace/explore_cook_sort_pseudotimes/find_drivers_events")
 
 LUAD_clusters <- read_excel("LUAD_groups_for_Lucie.xlsx")
 BRCA_clusters <- read_excel("data_for_lucie_BRCA_PRAD_OV.xlsx","BRCA")
@@ -87,7 +87,7 @@ BRCA_input<-merge(BRCA_clusters,BRCA_scores_EMT[,c(1:2)],by.x="Samples",by.y="Sa
 #
 # Merge with hypoxia scores
 #
-load("/home/guidantoniomt/pseudospace/pathway_characterization/broad_genomic_features/PancancerHypoxia.RData")
+load("/data/pseudospace/pathway_characterization/broad_genomic_features/PancancerHypoxia.RData")
 hypoxia_results_df2[,1]<-unlist(lapply(strsplit(gsub(hypoxia_results_df2[,1],pattern="\\.",replacement="-"),split="-"),FUN=function(X){paste(X[2:5],collapse="-")}))
 
 #
@@ -123,7 +123,7 @@ for(scexp in 1:length(list_input)){
   
   thr_min<-thr_minimum[scexp]
   
-  dir_cancer<-paste("/home/guidantoniomt/datasets/TCGA/harmonized/",current_cancer,sep="")
+  dir_cancer<-paste("/data/datasets/TCGA/harmonized/",current_cancer,sep="")
   
   setwd(dir_cancer)
   
@@ -295,7 +295,7 @@ for(scexp in 1:length(list_input)){
   
   input_circular_heatmap2$clusters<-factor(input_circular_heatmap2$clusters,levels=vector_order_to_use)
   
-  setwd("/home/guidantoniomt/pseudospace/explore_cook_sort_pseudotimes/find_drivers_events")
+  setwd("/data/pseudospace/explore_cook_sort_pseudotimes/find_drivers_events")
   
   status<-names(RES_AMP_DEP)[cnv_events]
   
@@ -350,7 +350,7 @@ for(scexp in 1:length(list_input)){
                          pemt_vs_epi = cnv_markers_pemt_vs_epi,
                          mex_vs_mix = cnv_markers_mes_vs_mix))
   
-  setwd("/home/guidantoniomt/pseudospace/explore_cook_sort_pseudotimes/find_drivers_events")
+  setwd("/data/pseudospace/explore_cook_sort_pseudotimes/find_drivers_events")
   
   output_pdf_venn<-paste("CNV_venn_for_clusters",current_cancer,".June.pdf",sep="")
   output_txt_venn<-paste("CNV_venn_for_clusters",current_cancer,".June.txt",sep="")

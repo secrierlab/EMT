@@ -1,4 +1,4 @@
-setwd("/home/guidantoniomt/pseudospace/ml_for_ppt/cosmic_focal_broad_variants")
+setwd("/data/pseudospace/ml_for_ppt/cosmic_focal_broad_variants")
 
 #
 # Compare lasso with random forest

@@ -10,7 +10,7 @@ list_tum<-c("LUAD","BRCA")
 
 for(tum in list_tum){
   
-  setwd("/home/guidantoniomt/pseudospace/explore_cook_sort_pseudotimes/find_drivers_events")
+  setwd("/data/pseudospace/explore_cook_sort_pseudotimes/find_drivers_events")
   
   # Create a vector with the list of files to use, in order by state (1:5)
   files_current_tum<-paste(paste(tum,"dndscv_siggenes.0.1",1:5,sep="."),".txt",sep="")
@@ -19,7 +19,7 @@ for(tum in list_tum){
     
   clusters_df<-data.frame(read_excel("LUAD_groups_for_Lucie.xlsx"))
   
-  load("/home/guidantoniomt/pseudospace/res_multiple_pseudospace/A549_mapped_seurat_correct_all_timecourse.RData")
+  load("/data/pseudospace/res_multiple_pseudospace/A549_mapped_seurat_correct_all_timecourse.RData")
   
   df_scores_EMT2<-df_scores_EMT[,c(1:2)]
   
@@ -35,7 +35,7 @@ for(tum in list_tum){
     
   clusters_df<-data.frame(read_excel("data_for_lucie_BRCA_PRAD_OV.xlsx","BRCA"))
   
-  load("/home/guidantoniomt/pseudospace/res_multiple_pseudospace/MCF7_mapped_seurat_correct_all_timecourse.RData")
+  load("/data/pseudospace/res_multiple_pseudospace/MCF7_mapped_seurat_correct_all_timecourse.RData")
   df_scores_EMT2<-df_scores_EMT[,c(1:2)]
   
   current_results<-merge(clusters_df,df_scores_EMT2,by.x="Samples",by.y="Samples")
@@ -85,7 +85,7 @@ for(tum in list_tum){
   # Prepare the data for the circular charts
   #
   
-  dir_cancer<-paste("/home/guidantoniomt/datasets/TCGA/harmonized/",tum,"/","GDCdata",sep="")
+  dir_cancer<-paste("/data/datasets/TCGA/harmonized/",tum,"/","GDCdata",sep="")
   
   setwd(dir_cancer)
   
@@ -115,7 +115,7 @@ for(tum in list_tum){
   percent_mut_for_cluster<-apply(freq_mut_for_cluster,1,FUN=function(X){X/sum(X)})
   percent_mut_for_genes<-apply(freq_mut_for_cluster,2,FUN=function(X){X/sum(X)})
   
-  #setwd("/home/guidantoniomt/pseudospace/explore_cook_sort_pseudotimes/find_drivers_events")
+  #setwd("/data/pseudospace/explore_cook_sort_pseudotimes/find_drivers_events")
   #write.table(freq_mut_for_cluster,file=paste(tum,"raw_nsamples_modules_genes.txt",sep="_"),row.names=T,sep="\t")
 
   #check number of patients with mutations in one gene
@@ -182,7 +182,7 @@ for(tum in list_tum){
   # links_genes[grep(links_genes$links_to_use,pattern="_0"),3]<-""
   # 
   # test5<-merge(test4,links_genes,by.x="genes",by.y="Detail")
-  setwd("/home/guidantoniomt/pseudospace/explore_cook_sort_pseudotimes/find_drivers_events")
+  setwd("/data/pseudospace/explore_cook_sort_pseudotimes/find_drivers_events")
   
   pdf(output_pdf)
   
@@ -201,7 +201,7 @@ for(tum in list_tum){
   dev.off()
   
   #Integrate with the gene-expression data
-  load("/home/guidantoniomt/pseudospace/input_pseudospace/TCGA_matrix_gene_expression_signals_ALLGENES_29_01_2020.RData")
+  load("/data/pseudospace/input_pseudospace/TCGA_matrix_gene_expression_signals_ALLGENES_29_01_2020.RData")
 
   columns_to_use<-grep(colnames(TCGA_GEXP_ALL),pattern=tum,value=T)
   

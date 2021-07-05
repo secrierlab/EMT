@@ -7,7 +7,7 @@ library(data.table)
 library(GSVA)
 library(parallel)
 
-setwd("/home/guidantoniomt/pseudospace/input_pseudospace")
+setwd("/datamt/pseudospace/input_pseudospace")
 load("TCGA_matrix_gene_expression_signals_ALLGENES_29_01_2020.RData")
 tcga<-TCGA_GEXP_ALL
 tcga[,-1]<-log(tcga[,-1]+1,2)
@@ -17,23 +17,23 @@ tcga2 <- data.frame(tcga[, lapply(.SD, mean), by = gene_symbol])
 rownames(tcga2)<-tcga2[,1]
 
 
-setwd("/home/guidantoniomt/pseudospace/pathway_characterization/fibroblast_analysis")
+setwd("/datamt/pseudospace/pathway_characterization/fibroblast_analysis")
 fibro_catalog<-as.data.frame(read_excel("Fibroblast_catalog.xlsx",col_names=F))
 fibro_catalog_list <- split(fibro_catalog[,-c(1,2)], seq(nrow(fibro_catalog)))         # Convert rows to list
 fibro_catalog_list<-lapply(fibro_catalog_list,FUN=function(X){as.character(na.omit(as.character(X)))})
 names(fibro_catalog_list)<-fibro_catalog[,2]
 
-purity_data<-read.delim(file="/home/guidantoniomt/datasets/TCGA_supp/purity/TCGA_mastercalls.abs_tables_JSedit.fixed.txt",stringsAsFactors=F)
+purity_data<-read.delim(file="/datamt/datasets/TCGA_supp/purity/TCGA_mastercalls.abs_tables_JSedit.fixed.txt",stringsAsFactors=F)
 purity_data$samples<- unlist(lapply(strsplit(as.character(purity_data$sample),split="-"),FUN=function(X){paste(X[1:4],collapse="-")}))
 purity_data<-purity_data[-which(is.na(purity_data$purity)),]
 
-knn_df_tcga<-read.delim(file="/home/guidantoniomt/pseudospace/HMM/HMM_results_nstates_tumors_for_states3.withEMT.txt",stringsAsFactors=F)
+knn_df_tcga<-read.delim(file="/datamt/pseudospace/HMM/HMM_results_nstates_tumors_for_states3.withEMT.txt",stringsAsFactors=F)
 knn_df_tcga$samples2<-knn_df_tcga$samples
 knn_df_tcga$samples<- unlist(lapply(strsplit(as.character(knn_df_tcga$samples),split="\\."),FUN=function(X){paste(X[2:5],collapse="-")}))
 
 emt_with_purity<-merge(knn_df_tcga,purity_data,by="samples")
 
-setwd("/home/guidantoniomt/pseudospace/pathway_characterization")
+setwd("/datamt/pseudospace/pathway_characterization")
 
 emt_with_purity$states<-gsub(emt_with_purity$states,pattern=1,replacement="pEMT")
 emt_with_purity$states<-gsub(emt_with_purity$states,pattern=2,replacement="epi")
@@ -61,7 +61,7 @@ for(i in 1:length(list_cancers)){
   fibroblast_list_results[[i]]<-res
 }
 
-setwd("/home/guidantoniomt/pseudospace/pathway_characterization/fibroblast_analysis")
+setwd("/datamt/pseudospace/pathway_characterization/fibroblast_analysis")
 save(fibroblast_list_results,file="PancancerFibroblastTME.ssgsea.RData")
 
 #
@@ -219,7 +219,7 @@ idx_genes<-which(res_gain>thr)
 
 genes_to_save_FS<-rownames(res_gain)[idx_genes]
 
-setwd("/home/guidantoniomt/pseudospace/pathway_characterization/fibroblast_analysis")
+setwd("/datamt/pseudospace/pathway_characterization/fibroblast_analysis")
 
 mat_markers_fibroblast<-data.frame(sampleID=rownames(exp_markers_fibroblasts2),exp_markers_fibroblasts2)
 mat_markers_fibroblast2<-merge(knn_df_tcga,mat_markers_fibroblast,by.x="samples2",by.y="sampleID")
@@ -290,7 +290,7 @@ res_aov_TME_df$padjust<-p.adjust(res_aov_TME_df[,6],"BH")
 
 aggregated_tme<-aggregate(value~states+variable,input_for_boxplot_fibroblast,mean)
 
-setwd("/home/guidantoniomt/pseudospace/pathway_characterization/fibroblast_analysis")
+setwd("/datamt/pseudospace/pathway_characterization/fibroblast_analysis")
 
 pdf("heatmap_TME_HMM_3_bytumor.ssgsea.Fibroblasts.pdf")
 aggregated_tme[which(aggregated_tme[,3]<0),3]<-0
@@ -331,7 +331,7 @@ remove_fibroblasts<-c("tumors","samples","samples2","LUNG","CRC","Breast_pCAF",
 
 library(nnet)
 
-setwd("/home/guidantoniomt/pseudospace/pathway_characterization/fibroblast_analysis")
+setwd("/datamt/pseudospace/pathway_characterization/fibroblast_analysis")
 
 ### Select train and test sets, dividing into 2/3 for train, 1/3 for test:
 set.seed(19875)

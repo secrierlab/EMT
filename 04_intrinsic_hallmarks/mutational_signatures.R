@@ -3,7 +3,7 @@
 #
 require(sjPlot)
 
-setwd('/home/guidantoniomt/pseudospace/HMM')
+setwd('/data/pseudospace/HMM')
 input_file<-c("HMM_results_nstates_3.txt")
 knn_df_tcga<-read.delim(file=input_file)
 
@@ -20,7 +20,7 @@ table(code_for_met,tum_for_met)
 # Read mutational signatures data SigProfiler
 #
 
-setwd("/home/guidantoniomt/pseudospace/mutational_signature/sbs_solutions_deconstructSigs_Sigprofiler")
+setwd("/data/pseudospace/mutational_signature/sbs_solutions_deconstructSigs_Sigprofiler")
 
 sampleinfo<-c("sigs.defaultnounknown.ACC.RData", "sigs.defaultnounknown.BLCA.RData","sigs.defaultnounknown.BRCA.metastatic.RData",
              "sigs.defaultnounknown.CESC.metastatic.RData","sigs.defaultnounknown.CHOL.RData","sigs.defaultnounknown.COAD.metastatic.RData",
@@ -62,7 +62,7 @@ sigs_ballon<-melt(store_matrices)[,-1]
 colnames(sigs_ballon)[ncol(sigs_ballon)]<-"tum"
 sigs_ballon$tum<-as.factor(sigs_ballon$tum)
 
-setwd("/home/guidantoniomt/pseudospace/mutational_signature/")
+setwd("/data/pseudospace/mutational_signature/")
 
 avg_contribution<-aggregate(.~tum+variable, sigs_ballon, mean)
 
@@ -221,7 +221,7 @@ library(caret)
 # 
 # require(ggplot2)
 
-setwd("/home/guidantoniomt/pseudospace/mutational_signature")
+setwd("/data/pseudospace/mutational_signature")
 # 
 # pdf("coefficients_mutsigs_with_pseudotime_tissuecorrect.pdf")
 # p1<-plot_summs(res_lm2, scale = TRUE, inner_ci_level = .9,coefs=update_sigs)
@@ -787,10 +787,10 @@ dev.off()
 # #
 # # Is the expression of the EPI/MES markers related with the mutational signatures?
 # #
-# setwd("/home/guidantoniomt/pseudospace/input_pseudospace")
+# setwd("/data/pseudospace/input_pseudospace")
 # load("TCGA_matrix_gene_expression_signals_ALLGENES_29_01_2020.RData")
 # 
-# setwd("/home/guidantoniomt/pseudospace/HMM")
+# setwd("/data/pseudospace/HMM")
 # markers_genes_read<-read.table(file="EMT_and_pEMT_markers.txt",header=T)
 # markers_genes<-markers_genes_read[,1]
 # 
@@ -803,7 +803,7 @@ dev.off()
 # 
 # all_pvalues_genes_per_sbs<-data.frame()
 # 
-# setwd("/home/guidantoniomt/pseudospace/mutational_signature")
+# setwd("/data/pseudospace/mutational_signature")
 # 
 # all_pvalues_genes_per_sbs<-data.frame()
 # 
@@ -828,7 +828,7 @@ dev.off()
 # 
 # library(pheatmap)
 # 
-# setwd("/home/guidantoniomt/pseudospace/mutational_signature")
+# setwd("/data/pseudospace/mutational_signature")
 # 
 # pdf(paste("All_groups","genes_signatures_pvalue.pdf",sep="."),width=15)
 # 

@@ -1,7 +1,7 @@
 library(data.table)
 library(plyr)
 
-setwd("/home/guidantoniomt/pseudospace/dndscv/hmm_3_states")
+setwd("/data/pseudospace/dndscv/hmm_3_states")
 
 list_files<-c("TCGA_projection_mock_HMM_3_withpemt.dndscv_siggenes.0.1.epi.txt",
 	      "TCGA_projection_mock_HMM_3_withpemt.dndscv_siggenes.0.1.mes.txt",
@@ -14,7 +14,7 @@ list_anno<-c("TCGA_projection_mock_HMM_3_withpemt.dndscv_anno.0.1.epi.txt",
               "TCGA_projection_mock_HMM_3_withpemt.dndscv_anno.0.1.mix.txt")
 names(list_anno)<-c("epi","mes","mix")
 
-setwd('/home/guidantoniomt/pseudospace/HMM')
+setwd('/data/pseudospace/HMM')
 input_file<-c("HMM_results_nstates_3.txt")
 
 knn_df_tcga<-read.delim(file=input_file)
@@ -28,7 +28,7 @@ classes_patients<-split(knn_df_tcga[,c("patients2","biological_states","tumors")
 # Prepare the variants data
 #
 
-setwd("/home/guidantoniomt/pseudospace/dndscv/hmm_3_states")
+setwd("/data/pseudospace/dndscv/hmm_3_states")
 
 list_results_var<-vector(mode="list",length=length(list_files))
 
@@ -67,7 +67,7 @@ res_tot_var[res_tot_var>1]<-1
 #
 # Prepare the copy-number data
 #
-setwd("/home/guidantoniomt/pseudospace/gistic/hmm_3_states")
+setwd("/data/pseudospace/gistic/hmm_3_states")
 
 folders_cnv<-c("epi","mes","mix")
 
@@ -79,7 +79,7 @@ for(fc in 1:length(folders_cnv)){
 
 	print(fold_cnv)
 
-	setwd(paste("/home/guidantoniomt/pseudospace/gistic/hmm_3_states",fold_cnv,sep="/"))
+	setwd(paste("/data/pseudospace/gistic/hmm_3_states",fold_cnv,sep="/"))
 
 	# for each group there are multiple directories for cancer type
 	sub_folders<-dir()
@@ -91,7 +91,7 @@ for(fc in 1:length(folders_cnv)){
 	       
 	sb2<-sub_folders[sb]
 
-	setwd(paste(paste("/home/guidantoniomt/pseudospace/gistic/hmm_3_states",fold_cnv,sep="/"),sb2,sep="/"))
+	setwd(paste(paste("/data/pseudospace/gistic/hmm_3_states",fold_cnv,sep="/"),sb2,sep="/"))
 	
 	# get all the lesions
 	
@@ -193,7 +193,7 @@ for(fc in 1:length(folders_cnv)){
 
 	ALL_CNA[[fc]]<-all_genomic_features
 
-	setwd(paste("/home/guidantoniomt/pseudospace/gistic/hmm_3_states"))
+	setwd(paste("/data/pseudospace/gistic/hmm_3_states"))
 
 }
 
@@ -248,7 +248,7 @@ colnames(sub_pseudotime)[1]<-"patients"
 
 input_tot_pseudotime<-merge(x=sub_pseudotime,y=input_tot,by.y="ID",by.x="patients")
 
-setwd("/home/guidantoniomt/pseudospace/ml_for_ppt")
+setwd("/data/pseudospace/ml_for_ppt")
 
 write.table(input_tot_pseudotime,file="input_for_ml_hmm_states_3_mock.txt",sep="\t",row.names=F,quote=F)
 
@@ -256,7 +256,7 @@ input_tot_pseudotime[is.na(input_tot_pseudotime)]<-0
 
 write.table(input_tot_pseudotime,file="input_for_ml_hmm_states_3_mock_v2.txt",sep="\t",row.names=F,quote=F)
 
-setwd("/home/guidantoniomt/datasets/TCGA/TCGA_supp/aneuploidy_score")
+setwd("/data/datasets/TCGA/TCGA_supp/aneuploidy_score")
 aneuploidy_score<-read.delim(file="aneuploidy_score_taylor_et_al2018.legacy.txt",stringsAsFactors=F)
 aneuploidy_score<-aneuploidy_score[,c(1,3,6)]
 colnames(aneuploidy_score)[c(2:3)]<-c("aneuploidy","genome_doubling")
@@ -271,6 +271,6 @@ input_tot_pseudotime_aneuploidy<-merge(x = input_tot_pseudotime,
 
 input_tot_pseudotime_aneuploidy[is.na(input_tot_pseudotime_aneuploidy)]<-0
 
-setwd("/home/guidantoniomt/pseudospace/ml_for_ppt")
+setwd("/data/pseudospace/ml_for_ppt")
 
 write.table(input_tot_pseudotime_aneuploidy,file="input_for_ml_hmm_states_3_mock_as_gd.txt",sep="\t",row.names=F,quote=F)

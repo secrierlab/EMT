@@ -1,16 +1,16 @@
 library(data.table)
 library(gridExtra)
 
-setwd("/home/guidantoniomt/pseudospace/ml_for_ppt/cosmic_focal_broad_variants")
+setwd("/data/pseudospace/ml_for_ppt/cosmic_focal_broad_variants")
 load("common_genomic_features_lasso_random_forest.RData")
 
 #Parameters
-output_dir<-"/home/guidantoniomt/pseudospace/ml_for_ppt/cosmic_focal_broad_variants"
+output_dir<-"/data/pseudospace/ml_for_ppt/cosmic_focal_broad_variants"
 tissue_correction = FALSE
 string_output = "cosmic_arms_focal"
 #
 
-setwd("/home/guidantoniomt/pseudospace/ml_for_ppt")
+setwd("/data/pseudospace/ml_for_ppt")
 
 input_ml<-fread("input_for_ml_hmm_states_3_mock_as_gd.txt",data.table=F)
 input_ml[is.na(input_ml)]<-0
