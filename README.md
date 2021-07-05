@@ -30,7 +30,7 @@ This folder contains the code to quantify the intrinsic hallmarks of EMT
 
 ## biomarkers_EMT
 This folder contains the pipeline used to identify the biomarkers of EMT
-- **run_pipepline_ml.sh:** The bash script call several Rscript to perform the identification of the biomarkers. Please open the .sh and infofile.txt to get more details about the procedure.
+- **run_pipepline_ml.sh:** This script contains the pipeline to perform the identification of the biomarkers. Please open the .sh and infofile.txt to get more details about the procedure.
 
 
 ## tissue_specific_trajectories
