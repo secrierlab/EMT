@@ -1,4 +1,4 @@
-# Genomic events shaping epithelial-to-mesenchymal trajectrories in cancer [under construction]
+# Epithelial-to-mesenchymal trajectory quantification in cancer
 ### Guidantonio Malagoli Tagliazucchi, Maria Secrier 
 UCL Genetics Institute, Department of Genetics,  Evolution and Environment,  University College London,  UK 
 
@@ -21,7 +21,7 @@ This folder contains the code to perform the segmentation of the EMT trajectory 
 This folder contains the code to quantify the extrinsic hallmarks of EMT
 - **run_fibroblast_deconvolution.R:** This is the script used to quantify the levels of fibroblast infiltration, contains also the code to run the multinomial logistic regression with the fibroblasts signals and the HMM states.
 - **run_tme_deconvolution.R:** This is the script used to quantify the cell components of Tumour Micro Environment (TME), contains also the code to run the multinomial logistic regression with the TME signals and the HMM states.
-- **run_tme_deconvolution.R:** This is the script used to quantify the cell components of Tumour Micro Environment (TME), contains also the code to run the multinomial logistic regression with the TME signals and the HMM states.
+- **run_stemness_broad_analysis.R:** script to compute the stemness scores using different gene-sets.
 - **characterize_extrinsic_hallmarks.R:** In this script there is the procedure to quantify the hypoxia scores (according to Buffa et al.). This script create also a data.frame that combine the quantification of several others hallmarks (e.g. centromeric amplification (CA20), aneuploidy, etc)
 
 ## intrinsic_hallmarks
@@ -60,6 +60,8 @@ This folder contains the code to perform the validation using external datasets.
 - **CRISPR_validation_CNV.R:** Get the Ceres Scores of the biomarkers associated with copy number alterations and plot heatmaps
 - **validation_Schaller_MUT.R:** This script check if putative biomarkers of EMT with mutations are targets of TFs important for EMT
 - **validation_Schaller_MUT.R:** This script check if putative biomarkers of EMT associated with CNV are targets of TFs important for EMT
+
+# How to cite
 
 # Copyright
 This code is free and is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY. See the GNU General Public License for more details.
