@@ -12,6 +12,7 @@ UCL Genetics Institute, Department of Genetics,  Evolution and Environment,  Uni
 This folder contains the code to reconstruct the EMT trajectory of the bulk RNA-seq data from TCGA
 - **namescript1.R:**
 - **namescript2.R:**
+- **run_analysis_pseudospace_TCGA_MET500.R:** procedure to quantify the EMT trajectory using TCGA and MET500 data
 
 ## HMM_macrostates_EMT
 This folder contains the code to perform the segmentation of the EMT trajectory and to identify the macrostates of EMT
