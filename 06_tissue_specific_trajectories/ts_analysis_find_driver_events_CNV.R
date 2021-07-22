@@ -6,7 +6,7 @@ library(ggpubr)
 library('biomaRt')
 mart <- useDataset("hsapiens_gene_ensembl", useMart("ensembl"))
 
-setwd("/home/guidantoniomt/pseudospace/ml_for_ppt/cosmic_focal_broad_variants")
+setwd("/data/pseudospace/")
 
 getFeaturesSS<-function(res_lasso,ss=800){
   
@@ -95,7 +95,7 @@ FisherByModule<-function(x,table_nsamples_for_state){
   
 }
 
-setwd("/home/guidantoniomt/pseudospace/ml_for_ppt/cosmic_focal_broad_variants")
+setwd("/data/pseudospace/")
 
 load("HMM_nstates3_mock.mes.vs.epi.tissue.TRUE.1000.cosmic_arms_focal.RData")
 
@@ -116,24 +116,24 @@ mut_genes_mes_vs_mix_raw<-grep(markers_mes_vs_epi,pattern="dndscv",value=T)
 cnv_markers_mes_vs_mix<-sapply(strsplit(grep(sub(grep(markers_mes_vs_epi,pattern="dndscv",value=T,invert=T),pattern="^X",replacement=""),pattern="focal",value=T),split="_"),"[[",1)
 
 
-cosmic_table<-read.csv(file="/home/guidantoniomt/pseudospace/ml_for_ppt/Census_allMon Aug 17 13_43_26 2020.csv",stringsAsFactors=F)
+cosmic_table<-read.csv(file="/data/pseudospace/Census_allMon Aug 17 13_43_26 2020.csv",stringsAsFactors=F)
 cosmic_genes<-as.character(cosmic_table[,1])
 
 #
 # Read the data for the analysis
 #
 
-load("/home/guidantoniomt/pseudospace/res_multiple_pseudospace/A549_mapped_seurat_correct_all_timecourse.RData")
+load("/data/pseudospace/A549_mapped_seurat_correct_all_timecourse.RData")
 LUAD_scores_EMT<-df_scores_EMT
 
-load("/home/guidantoniomt/pseudospace/res_multiple_pseudospace/MCF7_mapped_seurat_correct_all_timecourse.RData")
+load("/data/pseudospace/MCF7_mapped_seurat_correct_all_timecourse.RData")
 BRCA_scores_EMT<-df_scores_EMT
 
 #
 # Read input files for the analysis
 #
 
-setwd("/home/guidantoniomt/pseudospace/explore_cook_sort_pseudotimes/find_drivers_events")
+setwd("/data/pseudospace/find_drivers_events")
 
 LUAD_clusters <- read_excel("LUAD_groups_for_Lucie.xlsx")
 BRCA_clusters <- read_excel("data_for_lucie_BRCA_PRAD_OV.xlsx","BRCA")
@@ -180,7 +180,7 @@ for(scexp in 1:length(list_input)){
   
   thr_min<-thr_minimum[scexp]
   
-  dir_cancer<-paste("/home/guidantoniomt/datasets/TCGA/harmonized/",current_cancer,sep="")
+  dir_cancer<-paste("/TCGA/harmonized/",current_cancer,sep="")
   
   setwd(dir_cancer)
   
@@ -344,7 +344,7 @@ for(scexp in 1:length(list_input)){
     
   }
   
-  setwd("/home/guidantoniomt/pseudospace/explore_cook_sort_pseudotimes/find_drivers_events")
+  setwd("/data/pseudospace/")
   
   status<-names(RES_AMP_DEP)[cnv_events]
   
@@ -400,7 +400,7 @@ for(scexp in 1:length(list_input)){
                          pemt_vs_epi = cnv_markers_pemt_vs_epi,
                          mex_vs_mix = cnv_markers_mes_vs_mix))
   
-  setwd("/home/guidantoniomt/pseudospace/explore_cook_sort_pseudotimes/find_drivers_events")
+  setwd("/data/pseudospace/")
   
   output_pdf_venn<-paste("CNV_venn_for_clusters",current_cancer,".July.pdf",sep="")
   output_txt_venn<-paste("CNV_venn_for_clusters",current_cancer,".July.txt",sep="")
