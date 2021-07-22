@@ -32,8 +32,8 @@ This folder contains the code to quantify the intrinsic hallmarks of EMT
 
 ## biomarkers_EMT
 This folder contains the pipeline used to identify the biomarkers of EMT
-- **run_pipepline_ml.sh:** This script contains the pipeline to perform the identification of the biomarkers. Please open the .sh and infofile.txt to get more details about the procedure.
-
+- **run_pipeline_ml.sh:** This script contains the pipeline to perform the identification of the biomarkers. Please open the .sh and infofile.txt to get more details about the procedure.
+- **multiOmicsCharts.sh:** This script plots the results of the biomarkers discovered
 
 ## tissue_specific_trajectories
 This folder contains the pipeline used to identify tissue specifics trajectories in LUAD and BRCA, and the code to define the markers associated with EMT states
