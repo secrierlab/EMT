@@ -10,7 +10,7 @@ UCL Genetics Institute, Department of Genetics,  Evolution and Environment,  Uni
 
 ## ReconstructionEMTbulk
 This folder contains the code to reconstruct the EMT trajectory of the bulk RNA-seq data from TCGA
-- **namescript1.R:**
+- **projection_EMT_trajectory_MCF10A_to_TCGA.R:** main script to reconstruct the EMT trajectory of TCGA samples using as reference single-cell MCF10 data and their defined EMT pseudospace (trajectory). This script performs also several exploratory analysis. 
 - **namescript2.R:**
 - **run_analysis_pseudospace_TCGA_MET500.R:** procedure to quantify the EMT trajectory using TCGA and MET500 data
 
@@ -32,8 +32,8 @@ This folder contains the code to quantify the intrinsic hallmarks of EMT
 
 ## biomarkers_EMT
 This folder contains the pipeline used to identify the biomarkers of EMT
-- **run_pipepline_ml.sh:** This script contains the pipeline to perform the identification of the biomarkers. Please open the .sh and infofile.txt to get more details about the procedure.
-
+- **run_pipeline_ml.sh:** This script contains the pipeline to perform the identification of the biomarkers. Please open the .sh and infofile.txt to get more details about the procedure.
+- **multiOmicsCharts.sh:** This script plots the results of the biomarkers discovered
 
 ## tissue_specific_trajectories
 This folder contains the pipeline used to identify tissue specifics trajectories in LUAD and BRCA, and the code to define the markers associated with EMT states
@@ -61,7 +61,7 @@ This folder contains the code to perform the validation using external datasets.
 - **CRISPR_validation_MUT.R:** Get the Ceres Scores of the biomarkers associated with mutations and plot heatmaps
 - **CRISPR_validation_CNV.R:** Get the Ceres Scores of the biomarkers associated with copy number alterations and plot heatmaps
 - **validation_Schaller_MUT.R:** This script check if putative biomarkers of EMT with mutations are targets of TFs important for EMT
-- **validation_Schaller_MUT.R:** This script check if putative biomarkers of EMT associated with CNV are targets of TFs important for EMT
+- **validation_Schaller_CNV.R:** This script check if putative biomarkers of EMT associated with CNV are targets of TFs important for EMT
 
 # How to cite
 
