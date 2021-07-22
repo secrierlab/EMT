@@ -61,7 +61,7 @@ This folder contains the code to perform the validation using external datasets.
 - **CRISPR_validation_MUT.R:** Get the Ceres Scores of the biomarkers associated with mutations and plot heatmaps
 - **CRISPR_validation_CNV.R:** Get the Ceres Scores of the biomarkers associated with copy number alterations and plot heatmaps
 - **validation_Schaller_MUT.R:** This script check if putative biomarkers of EMT with mutations are targets of TFs important for EMT
-- **validation_Schaller_MUT.R:** This script check if putative biomarkers of EMT associated with CNV are targets of TFs important for EMT
+- **validation_Schaller_CNV.R:** This script check if putative biomarkers of EMT associated with CNV are targets of TFs important for EMT
 
 # How to cite
 
