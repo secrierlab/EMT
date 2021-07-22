@@ -14,7 +14,7 @@ RadarTheme<-theme(panel.background=element_blank(),
                   axis.line.x=element_line(size=0.5),
                   panel.grid.major=element_line(size=0.3,linetype = 2,colour="grey"))
 
-setwd("/home/guidantoniomt/pseudospace/ml_for_ppt/cosmic_focal_broad_variants")
+setwd("/home/data/pseudospace/ml_for_ppt/cosmic_focal_broad_variants")
 getFeaturesSS<-function(res_lasso,ss=800){
   
   df_coef2<-do.call(rbind,res_lasso)
@@ -103,25 +103,25 @@ common_between_three_groups<-Reduce(intersect,list_common_all)
 # Upload the biomarkers
 #
 
-tab_sampleinfo<-fread("/home/guidantoniomt/pseudospace/depmap/primary-screen-cell-line-info.csv",data.table=F)
+tab_sampleinfo<-fread("/home/data/pseudospace/depmap/primary-screen-cell-line-info.csv",data.table=F)
 
 #
 # Upload MET500
 #
 
-brain_metmap500<-read.xlsx("/home/guidantoniomt/pseudospace/CCLE/MetMap500_met_potential.xlsx",sheet = 1)
+brain_metmap500<-read.xlsx("/home/data/pseudospace/CCLE/MetMap500_met_potential.xlsx",sheet = 1)
 colnames(brain_metmap500)[1]<-"cell_line"
 
-lung_metmap500<-read.xlsx("/home/guidantoniomt/pseudospace/CCLE/MetMap500_met_potential.xlsx",sheet = 2)
+lung_metmap500<-read.xlsx("/home/data/pseudospace/CCLE/MetMap500_met_potential.xlsx",sheet = 2)
 colnames(lung_metmap500)[1]<-"cell_line"
 
-liver_metmap500<-read.xlsx("/home/guidantoniomt/pseudospace/CCLE/MetMap500_met_potential.xlsx",sheet = 3)
+liver_metmap500<-read.xlsx("/home/data/pseudospace/CCLE/MetMap500_met_potential.xlsx",sheet = 3)
 colnames(liver_metmap500)[1]<-"cell_line"
 
-bone_metmap500<-read.xlsx("/home/guidantoniomt/pseudospace/CCLE/MetMap500_met_potential.xlsx",sheet = 4)
+bone_metmap500<-read.xlsx("/home/data/pseudospace/CCLE/MetMap500_met_potential.xlsx",sheet = 4)
 colnames(bone_metmap500)[1]<-"cell_line"
 
-kidney_metmap500<-read.xlsx("/home/guidantoniomt/pseudospace/CCLE/MetMap500_met_potential.xlsx",sheet = 5)
+kidney_metmap500<-read.xlsx("/home/data/pseudospace/CCLE/MetMap500_met_potential.xlsx",sheet = 5)
 colnames(kidney_metmap500)[1]<-"cell_line"
 
 met_potential_list<-vector(mode="list",length=5)
@@ -144,7 +144,7 @@ codes_to_use_metmap<-tab_sampleinfo[which(tab_sampleinfo[,3]%in%met_pot_all2$cel
 # Load cna data CCLE
 #
 
-tab_cna_ccle<-fread(file="/home/guidantoniomt/pseudospace/CCLE/CCLE_gene_cn.csv",header=T,fill = TRUE,data.table=F)
+tab_cna_ccle<-fread(file="/home/data/pseudospace/CCLE/CCLE_gene_cn.csv",header=T,fill = TRUE,data.table=F)
 tab_cna_ccle_subselect<-tab_cna_ccle[tab_cna_ccle[,1]%in%codes_to_use_metmap,]
 colnames(tab_cna_ccle_subselect)<-gsub(sapply(strsplit(colnames(tab_cna_ccle_subselect),split="\\("),"[[",1),pattern=" ",replacement="")
 colnames(tab_cna_ccle_subselect)[1]<-"samples"
@@ -158,8 +158,11 @@ list_features[[1]]<-raw_markers_specifics_mes_vs_epi
 list_features[[2]]<-raw_markers_specifics_pemt_vs_epi
 list_features[[3]]<-raw_markers_specifics_mes_vs_mix
 list_features[[4]]<-raw_markers_common
-list_features[[5]]<-c("NONO_focal","MPL_focal","KIAA1459_focal","ETNK1_focal","FIP1L1_focal","CNTNAP2_focal","CREB3L2_focal")
-list_features[[6]]<-c("PRDM2_focal")
+#list_features[[5]]<-c("NONO_focal","MPL_focal","KIAA1459_focal","ETNK1_focal","FIP1L1_focal","CNTNAP2_focal","CREB3L2_focal")
+#list_features[[6]]<-c("PRDM2_focal")
+list_features[[5]]<-c("RUNX1_focal","NCOR1_focal","EPHA7_focal","TSHR_focal","CUX1_focal")
+list_features[[6]]<-c("MDS2_focal","PAX7_focal","PRDM2_focal","ID3_focal","ARID1A_focal","BAP1_focal","PBRM1_focal")
+
 
 # list_features[[5]]<-common_between_three_groups
 # list_features[[6]]<-c("EGFR_dndscv","SETD2_dndscv","RBM10_dndscv","CDKN2A_dndscv","RB1_dndscv","MGA_dndscv","ZIC1_dndscv","NF1_dndscv","REG3A_dndscv","ARID2_dndscv","ZFP36L1_dndscv","ARID1A_dndscv")
@@ -168,7 +171,7 @@ list_features[[6]]<-c("PRDM2_focal")
 # names(list_features)<-c("mes_vs_epi","hemt_vs_epi","mes_vs_mix","common","common_all","luad","breast")
 names(list_features)<-c("mes_vs_epi","hemt_vs_epi","mes_vs_mix","common","luad","breast")
 
-setwd("/home/guidantoniomt/pseudospace/CCLE")
+setwd("/home/data/pseudospace/CCLE")
 
 stat.test_sig_all<-data.frame()
 stat.test_sig_all_pancancer<-data.frame()
@@ -330,7 +333,7 @@ for(i in 1:length(list_features)){
     
   stat.test_sig<-res_stat_df[which(res_stat_df$p<=0.05),]
   
-  pdf(paste(name_comparison,".HEATMAP.metastatic_potential.CNV.pdf",sep=""))
+  pdf(paste(name_comparison,".HEATMAP.metastatic_potential.CNV.July.pdf",sep=""))
   stat.test_sig_heat<-stat.test_sig
   stat.test_sig_heat$logFCmut_no_mut<-log(stat.test_sig_heat$logFCmut_no_mut+1,2)
   ph<-ggplot(stat.test_sig_heat, aes(primary_tissue, genes, fill= logFCmut_no_mut)) +
@@ -353,7 +356,7 @@ for(i in 1:length(list_features)){
     
   input_boxplot<-tab_cna_with_ann_and_metpot[which(tab_cna_with_ann_and_metpot$primary_tissue %in% stat.test_sig[,2] & tab_cna_with_ann_and_metpot$genes %in% stat.test_sig[,1]),]
 
-  pdf(paste(name_comparison,".metastatic_potential.CNV.pdf",sep=""))
+  pdf(paste(name_comparison,".metastatic_potential.CNV.July.pdf",sep=""))
   
   stat.test_sig$fold_change_status<-ifelse(stat.test_sig$logFCmut_no_mut>1,"CNA","NO_CNA")
   
@@ -501,7 +504,7 @@ for(i in 1:length(list_features)){
 
 print("end analysis")
 
-pdf("HEATMAP.metastatic_potential.CNV.pdf")
+pdf("HEATMAP.metastatic_potential.CNV.July.pdf")
 
 stat.test_sig_all_heat<-stat.test_sig_all[-which(stat.test_sig_all$ID%in%c("luad","common","breast")),]
 
@@ -525,7 +528,7 @@ print(ph+p_annotation)
 
 dev.off()
 
-pdf("PANCANCER_HEATMAP.metastatic_potential.CNV.pdf")
+pdf("PANCANCER_HEATMAP.metastatic_potential.CNV.July.pdf")
 
 if(length(which(stat.test_sig_all_pancancer$ID%in%c("luad","common","breast")))==0){
   
@@ -586,7 +589,7 @@ dev.off()
 # There are not significant genes in BRCA AND LUAD  June
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-pdf("HEATMAP.metastatic_potential.CNV.BRCA_LUAD.pdf")
+pdf("HEATMAP.metastatic_potential.CNV.BRCA_LUAD.July.pdf")
  
  stat.test_sig_all_heat<-stat.test_sig_all[which(stat.test_sig_all$ID%in%c("luad","breast")),]
 
@@ -602,7 +605,7 @@ pdf("HEATMAP.metastatic_potential.CNV.BRCA_LUAD.pdf")
  
  ph<-ggplot(stat.test_sig_all_heat, aes(primary_tissue, genes, fill= logFCmut_no_mut)) +
    geom_tile(color = "black")+
-   scale_fill_gradient2(low = "brown", mid = "white", high = "blue2", midpoint = 0)+theme_bw()+
+   scale_fill_gradient2(low = "blue2", mid = "white", high = "brown", midpoint = 0)+theme_bw()+
    theme(axis.text.x = element_text(angle = 90))+
    geom_point(aes(colour = p,size=p))+scale_colour_gradientn(colours = ((brewer.pal(11,"Greys"))))
  
@@ -612,7 +615,8 @@ dev.off()
 
 # 
 # 
- pdf("PANCANCER_HEATMAP.metastatic_potential.CNV.BRCA_LUAD.pdf")
+
+ pdf("PANCANCER_HEATMAP.metastatic_potential.CNV.BRCA_LUAD.July.pdf")
  
  stat.test_sig_pancancer_all_heat<-stat.test_sig_all_pancancer[which(stat.test_sig_all_pancancer$ID%in%c("luad","breast")),]
 

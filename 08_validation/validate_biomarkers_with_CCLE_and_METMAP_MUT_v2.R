@@ -90,7 +90,7 @@ mut_genes_mes_vs_mix_raw<-intersect(mut_genes_mes_vs_mix_raw,unique(coef_coef_me
 
 
 raw_markers_specifics_mes_vs_epi<-setdiff(c(mut_genes_mes_vs_epi_raw),c(mut_genes_pemt_vs_epi_raw,mut_genes_mes_vs_mix_raw))
-raw_markers_specifics_pemt_vs_epi<-setdiff(y=c(mut_genes_mes_vs_epi_raw),x=c(mut_genes_pemt_vs_epi_raw,mut_genes_mes_vs_mix_raw))
+raw_markers_specifics_pemt_vs_epi<-setdiff(y=c(mut_genes_mes_vs_epi_raw,mut_genes_mes_vs_mix_raw),x=c(mut_genes_pemt_vs_epi_raw))
 raw_markers_common<-intersect(c(mut_genes_mes_vs_epi_raw),c(mut_genes_pemt_vs_epi_raw))
 
 raw_markers_specifics_mes_vs_mix<-setdiff(x=c(mut_genes_mes_vs_mix_raw),y=c(mut_genes_mes_vs_epi_raw,mut_genes_pemt_vs_epi_raw))

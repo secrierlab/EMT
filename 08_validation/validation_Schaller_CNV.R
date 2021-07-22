@@ -119,8 +119,9 @@ list_features[[1]]<-raw_markers_specifics_mes_vs_epi
 list_features[[2]]<-raw_markers_specifics_pemt_vs_epi
 list_features[[3]]<-raw_markers_specifics_mes_vs_mix
 list_features[[4]]<-raw_markers_common
-list_features[[5]]<-c("NONO","MPL","KIAA1459","ETNK1","FIP1L1","CNTNAP2","CREB3L2")
-list_features[[6]]<-c("PRDM2")
+list_features[[5]]<-c("RUNX1","NCOR1","EPHA7","TSHR","CUX1")
+list_features[[6]]<-c("MDS2","PAX7","PRDM2","ID3","ARID1A","BAP1","PBRM1")
+
 
 names(list_features)<-c("mes_vs_epi","hemt_vs_epi","mes_vs_mix","common","luad","breast")
 
@@ -153,7 +154,7 @@ ALL_TF_RES2$TF<-toupper(ALL_TF_RES2$TF)
 
 setwd("/home/guidantoniomt/pseudospace/Schaller_mouse_validation")
 
-pdf("Schaller_mouse_validation_CNV.pdf")
+pdf("Schaller_mouse_validation_CNV.July.pdf")
 
 ALL_TF_RES2_ml<-ALL_TF_RES2[-which(ALL_TF_RES2$comp%in%c("luad","breast")),]
 

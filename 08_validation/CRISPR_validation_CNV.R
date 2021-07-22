@@ -14,7 +14,7 @@ RadarTheme<-theme(
   panel.grid.minor = element_line(size = 0, linetype = 'black',colour = "black"))
 
 
-setwd("/home/guidantoniomt/pseudospace/ml_for_ppt/cosmic_focal_broad_variants")
+setwd("/home/data/pseudospace/ml_for_ppt/cosmic_focal_broad_variants")
 
 getFeaturesSS<-function(res_lasso,ss=800){
   
@@ -107,8 +107,11 @@ list_features[[1]]<-raw_markers_specifics_mes_vs_epi
 list_features[[2]]<-raw_markers_specifics_pemt_vs_epi
 list_features[[3]]<-raw_markers_specifics_mes_vs_mix
 list_features[[4]]<-raw_markers_common
-list_features[[5]]<-c("NONO_focal","MPL_focal","KIAA1459_focal","ETNK1_focal","FIP1L1_focal","CNTNAP2_focal","CREB3L2_focal")
-list_features[[6]]<-c("PRDM2_focal")
+#list_features[[5]]<-c("NONO_focal","MPL_focal","KIAA1459_focal","ETNK1_focal","FIP1L1_focal","CNTNAP2_focal","CREB3L2_focal")
+#list_features[[6]]<-c("PRDM2_focal")
+
+list_features[[5]]<-c("RUNX1_focal","NCOR1_focal","EPHA7_focal","TSHR_focal","CUX1_focal")
+list_features[[6]]<-c("MDS2_focal","PAX7_focal","PRDM2_focal","ID3_focal","ARID1A_focal","BAP1_focal","PBRM1_focal")
 
 names(list_features)<-c("mes_vs_epi","hemt_vs_epi","mes_vs_mix","common","luad","brca")
 
@@ -116,9 +119,9 @@ names(list_features)<-c("mes_vs_epi","hemt_vs_epi","mes_vs_mix","common","luad",
 # Upload the CRISPR data
 #
 
-setwd("/home/guidantoniomt/pseudospace/CCLE")
+setwd("/home/data/pseudospace/CCLE")
 
-tab_sampleinfo<-fread("/home/guidantoniomt/pseudospace/depmap/primary-screen-cell-line-info.csv",data.table=F)
+tab_sampleinfo<-fread("/home/data/pseudospace/depmap/primary-screen-cell-line-info.csv",data.table=F)
 
 # (DepMap 21Q2 Public+Score, CERES)
 
@@ -196,7 +199,7 @@ for(gtc in 1:length(groups_to_consider)){
           axis.text.x = element_text(angle = 90, vjust = 0.6))
   
   
-  pdf(paste(output_string,"_comparisons_CRISPR_gene_effect.CNV.pdf",sep=""),width=10)
+  pdf(paste(output_string,"_comparisons_CRISPR_gene_effect.CNV.July.pdf",sep=""),width=10)
   
   # print((ptissue/ph)+plot_layout(heights=c(0.20,0.80)))
   print(ph|p_annotation|pgenes)+plot_layout(widths=c(0.80,0.10,0.10))
