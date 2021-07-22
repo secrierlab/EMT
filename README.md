@@ -12,11 +12,13 @@ UCL Genetics Institute, Department of Genetics,  Evolution and Environment,  Uni
 This folder contains the code to reconstruct the EMT trajectory of the bulk RNA-seq data from TCGA
 - **namescript1.R:**
 - **namescript2.R:**
+- **run_analysis_pseudospace_TCGA_MET500.R:** procedure to quantify the EMT trajectory using TCGA and MET500 data
 
 ## HMM_macrostates_EMT
 This folder contains the code to perform the segmentation of the EMT trajectory and to identify the macrostates of EMT
 - **run_hmm.R:** This script contain the code to run the segmentation and perform the identification of the EMT states
- 
+- **HMM_noise.R:** This script implements a procedure to add noise (through the jitter function) in the original datasets and quantify the robustness of the HMM states 
+  
 ## extrinsic_hallmarks
 This folder contains the code to quantify the extrinsic hallmarks of EMT
 - **run_fibroblast_deconvolution.R:** This is the script used to quantify the levels of fibroblast infiltration, contains also the code to run the multinomial logistic regression with the fibroblasts signals and the HMM states.
