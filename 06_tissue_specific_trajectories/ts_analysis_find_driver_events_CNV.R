@@ -6,7 +6,7 @@ library(ggpubr)
 library('biomaRt')
 mart <- useDataset("hsapiens_gene_ensembl", useMart("ensembl"))
 
-setwd("/data/pseudospace/ml_for_ppt/cosmic_focal_broad_variants")
+setwd("/home/guidantoniomt/pseudospace/ml_for_ppt/cosmic_focal_broad_variants")
 
 getFeaturesSS<-function(res_lasso,ss=800){
   
@@ -38,7 +38,64 @@ getCoefSS<-function(res_lasso,features_to_select){
   
 }
 
-setwd("/data/pseudospace/ml_for_ppt/cosmic_focal_broad_variants")
+FisherByModule<-function(x,table_nsamples_for_state){
+  
+  #              M1  REST
+  # LASP1 (YES)  A - B
+  # LASP1 (NO)   C - D
+  #
+  all_pvalue<-NULL
+  
+  for(m in 1:length(x)){
+    
+    # A) number of samples in a specific module (m) with a copy number alteration 
+    nsamples_current_module<-x[m]
+    
+    # C) number of samples in "m" (e.g.M1) without alterations in LASP1. How many m1 samples are without the alteration?
+    nsamples_module_withoutgene<-table_nsamples_for_state[m]-x[m]
+    
+    # B) the number of samples in which an alteration is not in the current module (e.g. LASP1, M1) (Rest group)
+    nsamples_restmodule_withgene<-sum(x)-x[m]
+    
+    # D) number of samples without an alteration in any module
+    
+    # 1) Total number of samples  (except that one in the module of interest) and samples with alterations in M1
+    # The final number of samples is given by the sum obtained in 1) minus all the samples with an alterations in M1 (excluded the current module m)
+    # check sum(mtx_fisher) and sum(table_nsamples_for_state)
+    
+    
+    # nsamples<-table_nsamples_for_state[m]
+    nsamples<-sum(table_nsamples_for_state)-table_nsamples_for_state[m]
+    
+    allsamples_nogene<-nsamples-(sum(x)-x[m])
+    
+    vector_for_fisher<-c(nsamples_current_module,nsamples_restmodule_withgene,nsamples_module_withoutgene,allsamples_nogene)
+    
+    mtx_fisher<-matrix(vector_for_fisher,ncol=2,byrow=2)
+    
+    if(mtx_fisher[1,1]!=0){
+      
+      pvalue<-fisher.test(mtx_fisher,alternative="greater")$p.value
+      
+    } else {
+      
+      pvalue<-1
+      
+    }
+    
+    all_pvalue<-c(all_pvalue,pvalue)
+    
+  }
+  
+  names(all_pvalue)<-names(table_nsamples_for_state)
+  
+  all_pvalue<-p.adjust(all_pvalue)
+  
+  return(all_pvalue)
+  
+}
+
+setwd("/home/guidantoniomt/pseudospace/ml_for_ppt/cosmic_focal_broad_variants")
 
 load("HMM_nstates3_mock.mes.vs.epi.tissue.TRUE.1000.cosmic_arms_focal.RData")
 
@@ -59,24 +116,24 @@ mut_genes_mes_vs_mix_raw<-grep(markers_mes_vs_epi,pattern="dndscv",value=T)
 cnv_markers_mes_vs_mix<-sapply(strsplit(grep(sub(grep(markers_mes_vs_epi,pattern="dndscv",value=T,invert=T),pattern="^X",replacement=""),pattern="focal",value=T),split="_"),"[[",1)
 
 
-cosmic_table<-read.csv(file="/data/pseudospace/ml_for_ppt/Census_allMon Aug 17 13_43_26 2020.csv",stringsAsFactors=F)
+cosmic_table<-read.csv(file="/home/guidantoniomt/pseudospace/ml_for_ppt/Census_allMon Aug 17 13_43_26 2020.csv",stringsAsFactors=F)
 cosmic_genes<-as.character(cosmic_table[,1])
 
 #
 # Read the data for the analysis
 #
 
-load("/data/pseudospace/res_multiple_pseudospace/A549_mapped_seurat_correct_all_timecourse.RData")
+load("/home/guidantoniomt/pseudospace/res_multiple_pseudospace/A549_mapped_seurat_correct_all_timecourse.RData")
 LUAD_scores_EMT<-df_scores_EMT
 
-load("/data/pseudospace/res_multiple_pseudospace/MCF7_mapped_seurat_correct_all_timecourse.RData")
+load("/home/guidantoniomt/pseudospace/res_multiple_pseudospace/MCF7_mapped_seurat_correct_all_timecourse.RData")
 BRCA_scores_EMT<-df_scores_EMT
 
 #
 # Read input files for the analysis
 #
 
-setwd("/data/pseudospace/explore_cook_sort_pseudotimes/find_drivers_events")
+setwd("/home/guidantoniomt/pseudospace/explore_cook_sort_pseudotimes/find_drivers_events")
 
 LUAD_clusters <- read_excel("LUAD_groups_for_Lucie.xlsx")
 BRCA_clusters <- read_excel("data_for_lucie_BRCA_PRAD_OV.xlsx","BRCA")
@@ -87,7 +144,7 @@ BRCA_input<-merge(BRCA_clusters,BRCA_scores_EMT[,c(1:2)],by.x="Samples",by.y="Sa
 #
 # Merge with hypoxia scores
 #
-load("/data/pseudospace/pathway_characterization/broad_genomic_features/PancancerHypoxia.RData")
+load("/home/guidantoniomt/pseudospace/pathway_characterization/broad_genomic_features/PancancerHypoxia.RData")
 hypoxia_results_df2[,1]<-unlist(lapply(strsplit(gsub(hypoxia_results_df2[,1],pattern="\\.",replacement="-"),split="-"),FUN=function(X){paste(X[2:5],collapse="-")}))
 
 #
@@ -104,7 +161,7 @@ list_order[[1]]<-c("cluster3","cluster4","cluster5","cluster1","cluster2")
 list_order[[2]]<-c("cluster4","cluster2","cluster1","cluster5","cluster3")
 
 list_pvalue<-c(0.1,0.1)
-thr_minimum<-c(0.1,0.2)
+thr_minimum<-c(0.1,0.1)
 
 #
 # Iteration for cancer type
@@ -123,7 +180,7 @@ for(scexp in 1:length(list_input)){
   
   thr_min<-thr_minimum[scexp]
   
-  dir_cancer<-paste("/data/datasets/TCGA/harmonized/",current_cancer,sep="")
+  dir_cancer<-paste("/home/guidantoniomt/datasets/TCGA/harmonized/",current_cancer,sep="")
   
   setwd(dir_cancer)
   
@@ -159,6 +216,7 @@ for(scexp in 1:length(list_input)){
   
   RES_AMP_DEP<-vector(mode="list",2)           # store the genes to consider
   RES_AMP_DEP_MATRICES<-vector(mode="list",2) #  store the number of patients with CNV alterations
+  RES_AMP_DEP_SIG<-vector(mode="list",2) #  store the number of patients with CNV alterations
   
   for(events in 1:length(list_dep_amp)){
     
@@ -178,9 +236,17 @@ for(scexp in 1:length(list_input)){
 
   clusters_for_genes_df2<-clusters_for_genes_df[,which(colnames(clusters_for_genes_df)%in%genes_min_samples)]
 
-  ttest_genes<-apply(clusters_for_genes_df2,2,FUN=function(X){t.test(X)$p.value})
-  sig_genes2<-names(ttest_genes[ttest_genes<=0.05])
-
+  table_nsamples_for_state<-table(current_results[,2])
+  
+  fisher_res_table<-apply(clusters_for_genes_df2,2,FisherByModule,table_nsamples_for_state)
+  
+  #remove the genes that are not significant in any cluster
+  check_significance<-function(x){ifelse(length(x[x<0.05])==0,"discard","save")}
+  check_genes_module<-apply(fisher_res_table,2,check_significance)
+  sig_genes2<-names(check_genes_module[check_genes_module%in%"save"])
+  
+  fisher_res_table2<-fisher_res_table[,sig_genes2]
+  
   freq_for_genes<-t(apply(clusters_for_genes_df2[,colnames(clusters_for_genes_df2)%in%sig_genes2],2,FUN=function(X){X/sum(X)}))
   
   selected_freq_cnv_for_clusters<-apply(freq_for_genes,2,FUN=function(X){names(X[X>thr_min])})
@@ -189,43 +255,12 @@ for(scexp in 1:length(list_input)){
   
   RES_AMP_DEP[[events]]<-selected_freq_cnv_for_clusters
   RES_AMP_DEP_MATRICES[[events]]<-freq_for_genes
+  RES_AMP_DEP_SIG[[events]]<-fisher_res_table2
     
   }
   
   names(RES_AMP_DEP)<-c("depletion","amplification")
   
-  # 
-  #  Define a function to perform anova
-  # 
-  
-  AOVGenes<- function(X,genes_for_lme){
-    
-    all_pvalue<-NULL
-    df_genes_emt_scores<-NULL
-    res_AOV<-vector(mode="list",2)
-    
-    for(glme in genes_for_lme){
-      
-      #print(glme)
-      
-      emt_gene_with_mut<-unique(data.frame(status=1,X[X$Hugo_Symbol%in%glme,c("Samples","clusters","score_emt")]))
-      # emt_gene_without_mut<-unique(data.frame(status=0,mutect_file_snvs4[-which(mutect_file_snvs4$Hugo_Symbol%in%glme),c("Samples","clusters","score_emt")]))
-      # head(emt_gene_with_mut)
-      
-      pvalue_anova <-  as.numeric(unlist(summary(aov(score_emt ~ clusters, data = emt_gene_with_mut)))["Pr(>F)1"])
-      
-      all_pvalue<-c(all_pvalue,pvalue_anova)
-      
-      df_genes_emt_scores<-rbind(df_genes_emt_scores,data.frame(gene=glme,emt_gene_with_mut))
-    }
-    
-    names(all_pvalue)<-genes_for_lme
-    
-    res_AOV[[1]]<-all_pvalue
-    res_AOV[[2]]<-df_genes_emt_scores
-    
-    return(res_AOV)
-  }
   
   # 
   #  Get the significant genes
@@ -257,29 +292,14 @@ for(scexp in 1:length(list_input)){
   
   }
   
-  #
-  #Warning: use AOVGens only to get the EMT scores - not to define the sig. CNV altered between groups
-  #
-
-  resAOV<-AOVGenes(X=current_cnv_df2,genes_for_lme)
-  
-  #NOOO: there are not significant genes in this analysis
-  #genes_aov<-resAOV[[1]]
-  
-  # use directly the genes found during the pre-processing
-  genes_aov<-genes_for_lme
-
-  #genes_aov2<-genes_aov[genes_aov<=current_pvalue]
  
-  #genes_qvalue<-p.adjust(genes_aov,"BH")
-  
-  #genes_aov2<-genes_qvalue[genes_qvalue<=current_pvalue]  
+  # use directly the genes found during the pre-processing
+  genes_significant<-genes_for_lme
 
+  SIGNIFICANT_CNV_GENES[[cnv_events]]<-genes_significant  
 
-  SIGNIFICANT_CNV_GENES[[cnv_events]]<-genes_aov  
-
-  emt_clusters<-resAOV[[2]][,c(1,3,4,5)]
-  emt_clusters2<-aggregate(score_emt~clusters+gene, emt_clusters, median)
+  emt_clusters<-current_cnv_df2[current_cnv_df2$Hugo_Symbol %in% genes_significant,]
+  emt_clusters2<-aggregate(score_emt~clusters+Hugo_Symbol, emt_clusters, median)
   emt_clusters2$clusters<-paste("cluster",emt_clusters2$clusters,sep="")
   
   matrices_freq<-RES_AMP_DEP_MATRICES[[cnv_events]]
@@ -288,28 +308,58 @@ for(scexp in 1:length(list_input)){
   matrices_freq2<-melt(matrices_freq)
   colnames(matrices_freq2)<-c("genes","clusters","freq_perc")
   
-  input_circular_heatmap<-merge(matrices_freq2,emt_clusters2,by.x=c("clusters","genes"),by.y=c("clusters","gene"))
-  input_circular_heatmap2<-input_circular_heatmap[input_circular_heatmap$genes%in%genes_aov,]
-
-  # Create circular plot for copy number only
+  input_circular_heatmap<-merge(matrices_freq2,emt_clusters2,by.x=c("clusters","genes"),by.y=c("clusters","Hugo_Symbol"))
   
+  fisher_res<-melt(RES_AMP_DEP_SIG[[cnv_events]])
+  colnames(fisher_res)<-c("clusters","genes","sig")
+  
+  fisher_res$clusters<-paste("cluster",fisher_res$clusters,sep="")
+  
+  input_circular_heatmap2<-merge(input_circular_heatmap,fisher_res,by.x=c("clusters","genes"),by.y=c("clusters","genes"))
+  
+  # Create circular plot for copy number only
   input_circular_heatmap2$clusters<-factor(input_circular_heatmap2$clusters,levels=vector_order_to_use)
   
-  setwd("/data/pseudospace/explore_cook_sort_pseudotimes/find_drivers_events")
+  input_circular_heatmap2$siglog<- -log(input_circular_heatmap2$sig,10)
+  
+  # Remove the modules not statistically significant
+  # 0 is the -log(1,10) and -log(0.05,10)
+  if(length(which(input_circular_heatmap2$siglog==0))!=0){
+    
+  input_circular_heatmap3<-input_circular_heatmap2[-which(input_circular_heatmap2$siglog==0),]
+  
+  } else {
+  
+  input_circular_heatmap3<-input_circular_heatmap2
+    
+  }
+  
+  if(length(which(input_circular_heatmap3$siglog < -log(0.05,10)))!=0){
+    
+  input_circular_heatmap3<-input_circular_heatmap3[-which(input_circular_heatmap3$siglog < -log(0.05,10)),]
+  
+  }else{
+    
+  input_circular_heatmap3<-input_circular_heatmap3
+    
+  }
+  
+  setwd("/home/guidantoniomt/pseudospace/explore_cook_sort_pseudotimes/find_drivers_events")
   
   status<-names(RES_AMP_DEP)[cnv_events]
   
-  output_pdf<-paste("CNV_circular_heatmap_emt.",current_cancer,".",status,".June.pdf",sep="") 
+  output_pdf<-paste("CNV_circular_heatmap_emt.",current_cancer,".",status,"July.pdf",sep="") 
+  
   pdf(output_pdf)
   
   if(names(RES_AMP_DEP)[cnv_events]=="amplification"){
     
-  p<-ggplot(input_circular_heatmap2, aes(y = factor(clusters),
+  p<-ggplot(input_circular_heatmap3, aes(y = factor(clusters),
                        x = factor(genes))) +        ## global aes
     geom_tile(aes(fill = freq_perc))+
     scale_fill_gradientn(colours = (brewer.pal(11,"Reds"))) +         ## to get the rect filled
     geom_point(aes(colour = score_emt, 
-                   size = score_emt))  +    ## geom_point for circle illusion
+                   size = siglog))  +    ## geom_point for circle illusion
     scale_colour_gradientn(colours = rev(brewer.pal(11,"Spectral")))+
     theme_bw()+
     coord_polar(theta="x")
@@ -320,12 +370,12 @@ for(scexp in 1:length(list_input)){
   
   if(names(RES_AMP_DEP)[cnv_events]=="depletion"){
     
-   p<-ggplot(input_circular_heatmap2, aes(y = factor(clusters),
+   p<-ggplot(input_circular_heatmap3, aes(y = factor(clusters),
                                            x = factor(genes))) +        ## global aes
       geom_tile(aes(fill = freq_perc))+
       scale_fill_gradientn(colours = (brewer.pal(11,"Greens"))) +         ## to get the rect filled
       geom_point(aes(colour = score_emt, 
-                     size = score_emt))  +    ## geom_point for circle illusion
+                     size = siglog))  +    ## geom_point for circle illusion
       scale_colour_gradientn(colours = rev(brewer.pal(11,"Spectral")))+
       theme_bw()+
       coord_polar(theta="x")
@@ -350,10 +400,10 @@ for(scexp in 1:length(list_input)){
                          pemt_vs_epi = cnv_markers_pemt_vs_epi,
                          mex_vs_mix = cnv_markers_mes_vs_mix))
   
-  setwd("/data/pseudospace/explore_cook_sort_pseudotimes/find_drivers_events")
+  setwd("/home/guidantoniomt/pseudospace/explore_cook_sort_pseudotimes/find_drivers_events")
   
-  output_pdf_venn<-paste("CNV_venn_for_clusters",current_cancer,".June.pdf",sep="")
-  output_txt_venn<-paste("CNV_venn_for_clusters",current_cancer,".June.txt",sep="")
+  output_pdf_venn<-paste("CNV_venn_for_clusters",current_cancer,".July.pdf",sep="")
+  output_txt_venn<-paste("CNV_venn_for_clusters",current_cancer,".July.txt",sep="")
   
   pdf(output_pdf_venn)
   
