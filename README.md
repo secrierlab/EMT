@@ -13,6 +13,10 @@ This folder contains the code to reconstruct the EMT trajectory of the bulk RNA-
 - **projection_EMT_trajectory_MCF10A_to_TCGA.R:** main script to reconstruct the EMT trajectory of TCGA samples using as reference single-cell MCF10 data and their defined EMT pseudospace (trajectory). This script performs also several exploratory analysis. 
 - **namescript2.R:**
 - **run_analysis_pseudospace_TCGA_MET500.R:** procedure to quantify the EMT trajectory using TCGA and MET500 data
+- **projection_EMT_trajectory_MCF10A_to_CCLE.R:** main script to reconstruct the EMT trajectory of CCLE samples using as reference single-cell MCF10 data and their defined EMT pseudospace (trajectory). This script performs also several exploratory analysis. This script combine also EMT states with the information of the metastatic potential.
+- **knnForCCLE_MCF.R:** functions useful to run projection_EMT_trajectory_MCF10A_to_CCLE.R
+- **petalChartGMT.R:** functions useful to run projection_EMT_trajectory_MCF10A_to_CCLE.R
+ 
 
 ## HMM_macrostates_EMT
 This folder contains the code to perform the segmentation of the EMT trajectory and to identify the macrostates of EMT
