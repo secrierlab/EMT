@@ -6,7 +6,7 @@ library(irlba)
 library(FNN)
 
 source('functions_plot_pseudospace.R')
-current_dir<-getwd()
+folder_analysis<-getwd()
 
 setwd('..')
 current_dir<-getwd()
@@ -346,7 +346,7 @@ input_cp<-merge(input_cp,sub_clinical2[,c(1,2)],by='patients')
 
 input_cp$tumor_stage<-as.factor(input_cp$tumor_stage)
 
-setwd('/home/data/pseudospace/tcga_nocorrect_primary_tumors/23_04_2020_threegroups')
+setwd(output_dir)
 
 save.image(file="KNN_projection_TCGA_to_MCF10A_no_correction_primarytumor.RData")
 
@@ -443,7 +443,7 @@ library(gridExtra)
 library(cluster)
 
 #source("/home/data/pseudospace/tcga_nocorrect_primary_tumors/explore_markers_in_pseudotime.R")
-source(paste(current_dir,"explore_markers_in_pseudotime_epithelial.R",sep="/"))
+source(paste(folder_analysis,"explore_markers_in_pseudotime_epithelial.R",sep="/"))
 
 #
 # Save results PAM
@@ -463,7 +463,7 @@ write.table(input_cp_pemt,file="proj_pseudospace_mcf_tgfb_mock_pam3_without_pemt
 # Save results mclust
 #
 
-source(paste(current_dir,"explore_markers_in_pseudotime_epithelial.R",sep="/"))
+source(paste(folder_analysis,"explore_markers_in_pseudotime_epithelial.R",sep="/"))
 
 input_cp_pemt<-list_results_clusters_markers[["with_pemt"]]
 input_cp_pemt$clusters2<-rep("null",nrow(input_cp_pemt))
