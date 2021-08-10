@@ -21,6 +21,8 @@ All the analysis have been run on a server with 64 CPU (Intel(R) Xeon(R) Gold 52
 
 ## Data
 The majority of the data used in this work are in the folde /data. In addition, we provide a script to download the data from several repositories.
+The references of the datasets used in this work are reported in the section "References" of this page, and in the main manuscript. 
+
 Steps:
 
 1) run the scripts inside the /data folder as follow:
