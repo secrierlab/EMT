@@ -43,7 +43,7 @@ Steps:
 foo@bar:~$ sh decompress_data.sh
 foo@bar:~$ sh download_data.sh
 ```
-## How to run a script
+## How to run a script (DEMO)
 
 1) Check that all the depencies are installed (INSTALL.R script)
 2) Open RStudio or a R-shell
