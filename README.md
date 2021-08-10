@@ -11,6 +11,7 @@ UCL Genetics Institute, Department of Genetics,  Evolution and Environment,  Uni
 ## System Requirements
 Operating system(s): Platform Indipendent
 Programming Language: R
+All the analysis have been ran on a server with 64 CPU (Intel(R) Xeon(R) Gold 5218 CPU @ 2.30GHz) and 376G of RAM.
 
 ## Installation
 - Install R >= 3.6.1, available on https://cran.r-project.org/
