@@ -9,7 +9,7 @@ UCL Genetics Institute, Department of Genetics,  Evolution and Environment,  Uni
 # Table of contents
 
 ## System Requirements
-Operating system(s): Platform Indipendent
+Operating system(s): Unix (linux, mac)
 Programming Language: R
 All the analysis have been run on a server with 64 CPU (Intel(R) Xeon(R) Gold 5218 CPU @ 2.30GHz) and 376G of RAM.
 
@@ -17,6 +17,17 @@ All the analysis have been run on a server with 64 CPU (Intel(R) Xeon(R) Gold 52
 - Install R >= 3.6.1, available on https://cran.r-project.org/
 - Install RStudio (Optional), available on https://www.rstudio.com/products/rstudio/download/
 - An install file with the R-libraries to install and dependencies is provided (INSTALL.R). The user can copy and paste the following line on a R shell.
+- See section "Data" to get more information about the sources of data and how retrieve them
+
+## Data
+The majority of the data used in this work are in the folde /data. In addition, we provide a script to download the data from several repositories.
+Steps:
+
+1) run the scripts inside the /data folder as follow:
+```console
+foo@bar:~$ sh decompress_data.sh
+foo@bar:~$ sh download_data.sh
+```
 
 ## ReconstructionEMTbulk
 This folder contains the code to reconstruct the EMT trajectory of the bulk RNA-seq data from TCGA
