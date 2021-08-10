@@ -45,7 +45,7 @@ setwd("/Users/username/Desktop/EMT-main/02_HMM_macrostates_EMT")
 # run the script
 source("run_hmm.R")
 ```
-Note: The scripts are able to upload the data (/data) they must to use automatically.
+**Note**: The scripts are able to upload the data (/data) they must to use automatically.
 
 The example reported above employs less than 5 min to run on a normal laptop/desktop computer (2.4 GHz Quad-Core Intel Core i5, 8 GB 2133 MHz LPDDR3).
 
