@@ -30,6 +30,24 @@ Steps:
 foo@bar:~$ sh decompress_data.sh
 foo@bar:~$ sh download_data.sh
 ```
+## How to run a script
+
+1) Check that all the depencies are installed (INSTALL.R script)
+2) Open RStudio or shell
+3) Move in the path with the script of interest as follow. 
+
+For example if the user wants to run the segmentation   (run_hmm.R) on a toy dataset of gene-expression (TCGA) these are the steps to use:
+
+```r
+# Move in the directory in which there is a script
+setwd("/Users/username/Desktop/EMT-main/02_HMM_macrostates_EMT")
+
+# run the script
+source("run_hmm.R")
+```
+Note: The scripts are able to upload the data (/data) they must to use automatically.
+
+The example reported above employs less than 5 min to run on a normal laptop/desktop computer (2.4 GHz Quad-Core Intel Core i5, 8 GB 2133 MHz LPDDR3).
 
 ## ReconstructionEMTbulk
 This folder contains the code to reconstruct the EMT trajectory of the bulk RNA-seq data from TCGA
