@@ -14,7 +14,7 @@ current_dir<-getwd()
 input_dir<-paste(current_dir,"/data",sep="")
 output_dir<-paste(current_dir,"/output_dir",sep="")
 
-load("TCGA_matrix_gene_expression_signals_ALLGENES_29_01_2020.RData")
+load("TCGA_exp_rid.RData")
 
 setwd(input_dir)
 pseudospace_input<-read.delim(file="proj_pseudospace_mcf_tgfb_mock_Mclust3_with_pemt.txt")

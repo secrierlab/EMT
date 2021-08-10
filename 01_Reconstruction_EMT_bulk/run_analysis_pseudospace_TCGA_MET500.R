@@ -55,7 +55,7 @@ print(range(tgfb_norm2[,-c(1:2)]))
 # 
 # upload TCGA
 # 
-load('TCGA_matrix_gene_expression_signals_ALLGENES_29_01_2020.RData')
+load('TCGA_exp_rid.RData')
 
 # UPLOAD MET500 DATA-SET
 load('MET500_rna_seq_log2_fpkm.ALLGENES.RData')

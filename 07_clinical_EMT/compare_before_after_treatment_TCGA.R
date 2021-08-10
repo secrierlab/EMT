@@ -63,7 +63,7 @@ knn_df_tcga$samples<- unlist(lapply(strsplit(as.character(knn_df_tcga$samples),s
 # 
 
 setwd(input_dir)
-load("TCGA_matrix_gene_expression_signals_ALLGENES_29_01_2020.RData")
+load("TCGA_exp_rid.RData")
 
 tcga<-TCGA_GEXP_ALL
 tcga[,-1]<-log(tcga[,-1]+1,2)
