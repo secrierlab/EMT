@@ -16,6 +16,6 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
 BiocManager::install(c("DropletUtils","DESeq2",
                        "monocle","TSCAN","slingshot",
                        "ComplexHeatmap","GSVA","VennDetail",
-                       "biomaRt","depmap","sva","TCGAbiolinks")
-=
+                       "biomaRt","depmap","sva","TCGAbiolinks"))
+
 
