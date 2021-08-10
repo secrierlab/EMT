@@ -19,6 +19,17 @@ All the analysis have been run on a server with 64 CPU (Intel(R) Xeon(R) Gold 52
 - An install file with the R-libraries to install and dependencies is provided (INSTALL.R). The user can copy and paste the following line on a R shell.
 - See section "Data" to get more information about the sources of data and how retrieve them
 
+Here the procedure:
+
+```r
+# Move in the directory in which there is a script
+setwd("/Users/username/Desktop/EMT-main")
+
+# run the script
+source("install.R")
+```
+On a normal laptop/desktop computer (2.4 GHz Quad-Core Intel Core i5, 8 GB 2133 MHz LPDDR3), the installation could take 20-30 minutes.
+
 ## Data
 The majority of the data used in this work are in the folde /data. In addition, we provide a script to download the data from several repositories.
 The references of the datasets used in this work are reported in the section "References" of this page, and in the main manuscript. 
