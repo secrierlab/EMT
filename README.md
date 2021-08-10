@@ -45,10 +45,13 @@ setwd("/Users/username/Desktop/EMT-main/02_HMM_macrostates_EMT")
 # run the script
 source("run_hmm.R")
 ```
-**Note**: The scripts are able to upload the data (/data) they must to use automatically.
-
 The example reported above employs less than 5 min to run on a normal laptop/desktop computer (2.4 GHz Quad-Core Intel Core i5, 8 GB 2133 MHz LPDDR3).
+The expected output file for this toy example are several charts (with the results of the segmentation) and tables. **Note:**, this is toy example, the biological assignments (e.g. pEMT) of the HMM states could be different respect the pan-cancer analysis. See material and methods for more details.
 
+**Notes:**: 
+- The scripts are able to upload the data (/data) they must to use automatically.
+- All the output of the scripts are saved in the folder (output_dir) 
+ 
 ## ReconstructionEMTbulk
 This folder contains the code to reconstruct the EMT trajectory of the bulk RNA-seq data from TCGA
 - **projection_EMT_trajectory_MCF10A_to_TCGA.R:** main script to reconstruct the EMT trajectory of TCGA samples using as reference single-cell MCF10 data and their defined EMT pseudospace (trajectory). This script performs also several exploratory analysis. 
