@@ -1,5 +1,12 @@
 setwd("/data/pseudospace/ml_for_ppt/cosmic_focal_broad_variants")
 
+folder_analysis<-getwd()
+
+setwd('..')
+current_dir<-getwd()
+input_dir<-paste(current_dir,"/data",sep="")
+output_dir<-paste(current_dir,"/output_dir",sep="")
+
 #
 # Compare lasso with random forest
 #
@@ -13,6 +20,8 @@ list_class2<-c("epi","mix","epi")
 
 list_lasso_res<-vector(mode="list",2)
 list_common_genes_between_experiments<-vector(mode="list",2)
+
+setwd(input_dir)
 
 for(i in 1:length(list_rdata_lasso)){
 
@@ -87,6 +96,8 @@ names(list_common_genes_between_experiments)<-c("mes_vs_epi",
 						"mes_vs_mix",
 						"mix_vs_epi")
 
+setwd(output_dir)
+
 save(x=list_common_genes_between_experiments,
 	   file="common_genomic_features_lasso_random_forest.RData")
 
@@ -139,29 +150,33 @@ for(i in 1:length(list_rdata_lasso)){
 
 }
 
+setwd(output_dir)
 
-        library(VennDiagram)
-        library(VennDetail)
+
+library(VennDiagram)
+library(VennDetail)
         
-	pdf(paste("venny_lasso_analysis_top50.pdf",sep=""))
-        venn<-venndetail(results_lasso_50)
-        plot(venn)
-        p<-plot(venn, type = "upset")
-        print(p)
-        dev.off()
+pdf(paste("venny_lasso_analysis_top50.pdf",sep=""))
+venn<-venndetail(results_lasso_50)
+plot(venn)
+p<-plot(venn, type = "upset")
+print(p)
+dev.off()
 
 
-        pdf(paste("venny_lasso_analysis_80perc.pdf",sep=""))
-        venn<-venndetail(results_lasso_80)
-        plot(venn)
-        p<-plot(venn, type = "upset")
-        print(p)
-        dev.off()
+pdf(paste("venny_lasso_analysis_80perc.pdf",sep=""))
+venn<-venndetail(results_lasso_80)
+plot(venn)
+p<-plot(venn, type = "upset")
+print(p)
+dev.off()
 
 
 #
 # Compare random forest 
 #
+
+setwd(input_dir)
 
 list_rdata_rf<-c("RF_HMM_nstates3_mock.mes.vs.epi.tissue.FALSE.1000.topgenes.800.cosmic_arms_focal_train_0.80.RData","RF_HMM_nstates3_mock.mes.vs.mix.tissue.FALSE.1000.topgenes.800.cosmic_arms_focal_train_0.80.RData","RF_HMM_nstates3_mock.mix.vs.epi.tissue.FALSE.1000.topgenes.800.cosmic_arms_focal_train_0.80.RData")
 
@@ -184,10 +199,12 @@ for(i in 1:length(list_rdata_lasso)){
 	results_rf[[i]]<-as.character(rf_features)
 }
 
-        pdf(paste("venny_rf_analysis.pdf",sep=""))
-        venn<-venndetail(results_rf)
-        plot(venn)
-        p<-plot(venn, type = "upset")
-        print(p)
-        dev.off()
+setwd(output_dir)
+
+pdf(paste("venny_rf_analysis.pdf",sep=""))
+venn<-venndetail(results_rf)
+plot(venn)
+p<-plot(venn, type = "upset")
+print(p)
+dev.off()
 

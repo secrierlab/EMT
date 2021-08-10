@@ -7,14 +7,22 @@ library(gridExtra)
 library(viridis)
 library(plyr)
 
+folder_analysis<-getwd()
+
+setwd('..')
+current_dir<-getwd()
+input_dir<-paste(current_dir,"/data",sep="")
+output_dir<-paste(current_dir,"/output_dir",sep="")
+
 # The list of fibroblasts are those one 
-load("/home/data/pseudospace/pathway_characterization/broad_genomic_features/aneuploidy_stem_hypo_TME_Fibroblasts_TCGA.RData")
+setwd(input_dir)
+load("aneuploidy_stem_hypo_TME_Fibroblasts_TCGA.RData")
 input_gf_tme_fb2<-input_gf_tme_fb
 input_gf_tme_fb2$states<-gsub(input_gf_tme_fb2$states,pattern="1",replacement="pEMT")
 input_gf_tme_fb2$states<-gsub(input_gf_tme_fb2$states,pattern="2",replacement="epi")
 input_gf_tme_fb2$states<-gsub(input_gf_tme_fb2$states,pattern="3",replacement="mes")
 
-input_ml<-fread("/home/data/pseudospace/ml_for_ppt/input_for_ml_hmm_states_3_mock_as_gd.txt",data.table=F)
+input_ml<-fread("input_for_ml_hmm_states_3_mock_as_gd.txt",data.table=F)
 colnames(input_ml)<-gsub(colnames(input_ml),pattern="^X",replacement="")
 input_ml$patients<-unlist(lapply(strsplit(as.character(input_ml$patients),split="\\-"),FUN=function(X){paste(X[1:3],collapse="-")}))
 input_ml2<-input_ml
@@ -24,7 +32,7 @@ input_ml<-input_ml[input_ml$patients%in%input_gf_tme_fb2$samplesID,]
 # The list of fibroblasts are those one that have been obtained from the glm analysis
 list_fibroblasts_to_consider_mes_vs_epi<-c("Fibroblasts","COL11A1_FS","Esophageal_CAF_markers_carcinogenesis","BLADDER_CAF_markers")
 
-setwd("/home/data/pseudospace/ml_for_ppt/cosmic_focal_broad_variants")
+setwd(output_dir)
 
 getFeaturesSS<-function(res_lasso,ss=800){
   
@@ -56,7 +64,7 @@ getCoefSS<-function(res_lasso,features_to_select){
   
 }
 
-setwd("/home/data/pseudospace/ml_for_ppt/cosmic_focal_broad_variants")
+setwd(input_dir)
 
 load("HMM_nstates3_mock.mes.vs.epi.tissue.TRUE.1000.cosmic_arms_focal.RData")
 
@@ -508,7 +516,7 @@ integration_multichart<-function(coef_data_matrix,list_res_comparison,genomic_ma
   dev.off()
   
 }  
-setwd("/home/data/pseudospace/pathway_characterization/broad_genomic_features")
+setwd(output_dir)
 
 # 
 # Build plot MES-EPI 

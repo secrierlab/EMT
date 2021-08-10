@@ -1,16 +1,22 @@
 library(data.table)
 library(gridExtra)
 
-setwd("/data/pseudospace/ml_for_ppt/cosmic_focal_broad_variants")
+folder_analysis<-getwd()
+
+setwd('..')
+current_dir<-getwd()
+input_dir<-paste(current_dir,"/data",sep="")
+output_dir<-paste(current_dir,"/output_dir",sep="")
+
+setwd(input_dir)
 
 #Parameters
-output_dir<-"/data/pseudospace/ml_for_ppt/cosmic_focal_broad_variants"
+output_dir<-output_dir
 tissue_correction = TRUE
 string_output = "cosmic_arms_focal"
 #
 
-setwd("/data/pseudospace/ml_for_ppt")
-
+setwd(input_dir)
 input_ml<-fread("input_for_ml_hmm_states_3_mock_as_gd.txt",data.table=F)
 input_ml[is.na(input_ml)]<-0
 
@@ -26,7 +32,7 @@ idx_columns<-grep(colnames(input_ml),pattern=paste(c("dndscv","focal"),collapse=
 #
 # Load COSMIC genes for the analysis
 #
-
+setwd(input_dir)
 cosmic_table<-read.csv(file="Census_allMon Aug 17 13_43_26 2020.csv",stringsAsFactors=F)
 #cosmic_genes<-paste(cosmic_table[,1],collapse="|")
 
@@ -69,7 +75,7 @@ for(i in 1:length(list_rdata_lasso)){
 	class1<-list_class1[i]
 	class2<-list_class2[i]
 
-        input_ml2<-input_ml[input_ml$biological_states %in% c(class1,class2),c(5,6:ncol(input_ml))]
+  input_ml2<-input_ml[input_ml$biological_states %in% c(class1,class2),c(5,6:ncol(input_ml))]
 
 	#
 	# Get top 50 genes from lasso
@@ -83,32 +89,32 @@ for(i in 1:length(list_rdata_lasso)){
 	
 	df_coef2<-df_coef2[grep(df_coef2[,1],pattern=paste(c("Intercept","tumors"),collapse="|"),invert=T),]
 
-        features<-data.frame(table(df_coef2[,1]))
+  features<-data.frame(table(df_coef2[,1]))
 
-        lasso_features_top50<-features[order(features[,2],decreasing=T),1][1:50]
+  lasso_features_top50<-features[order(features[,2],decreasing=T),1][1:50]
 	
 	#
 	# Get top 80% genes from lasso
 	#
 
 	# get the most frequent (80%) genes from lasso
-        df_coef2<-do.call(rbind,res_lasso)
+  df_coef2<-do.call(rbind,res_lasso)
 
-        df_coef2<-df_coef2[grep(df_coef2[,1],pattern=paste(c("Intercept","tumors"),collapse="|"),invert=T),]
+  df_coef2<-df_coef2[grep(df_coef2[,1],pattern=paste(c("Intercept","tumors"),collapse="|"),invert=T),]
 
-        features<-data.frame(table(df_coef2[,1]))
+  features<-data.frame(table(df_coef2[,1]))
 
-        features_freq_df<-features[order(features[,2],decreasing=T),]
+  features_freq_df<-features[order(features[,2],decreasing=T),]
 
-        lasso_features_80<-features_freq_df[features_freq_df[,2]>=800,1]
+  lasso_features_80<-features_freq_df[features_freq_df[,2]>=800,1]
 
 	
 
 	lasso_50_columns<-which(colnames(input_ml2) %in% c("biological_states","tumors",as.character(lasso_features_top50)))
-        lasso_80_columns<-which(colnames(input_ml2) %in% c("biological_states","tumors",as.character(lasso_features_80)))
+  lasso_80_columns<-which(colnames(input_ml2) %in% c("biological_states","tumors",as.character(lasso_features_80)))
 
         				
-        input_ml2$biological_states<-as.factor(gsub(gsub(input_ml2[,1],pattern=class1,replacement=1),pattern=class2,replacement=0))
+  input_ml2$biological_states<-as.factor(gsub(gsub(input_ml2[,1],pattern=class1,replacement=1),pattern=class2,replacement=0))
 	
 	idx_for_training<-sample(round(nrow(input_ml2)*80/100))
 
@@ -117,16 +123,16 @@ for(i in 1:length(list_rdata_lasso)){
 
 	tissue_common_50<-intersect(training_50[,2],test_50[,2])
 
-        training_50<-training_50[training_50[,2]%in%tissue_common_50,]
-        test_50<-test_50[test_50[,2]%in%tissue_common_50,]
+  training_50<-training_50[training_50[,2]%in%tissue_common_50,]
+  test_50<-test_50[test_50[,2]%in%tissue_common_50,]
 
-        training_80<-input_ml2[idx_for_training,lasso_80_columns]
-        test_80<-input_ml2[-idx_for_training,lasso_80_columns]
+  training_80<-input_ml2[idx_for_training,lasso_80_columns]
+  test_80<-input_ml2[-idx_for_training,lasso_80_columns]
 
-        tissue_common_80<-intersect(training_80[,2],test_80[,2])
+  tissue_common_80<-intersect(training_80[,2],test_80[,2])
 
-        training_80<-training_80[training_80[,2]%in%tissue_common_80,]
-        test_80<-test_80[test_80[,2]%in%tissue_common_80,]
+  training_80<-training_80[training_80[,2]%in%tissue_common_80,]
+  test_80<-test_80[test_80[,2]%in%tissue_common_80,]
 
 	library(ROCR)
 	library(caret)
@@ -156,23 +162,25 @@ for(i in 1:length(list_rdata_lasso)){
 
 	glmnet80 <- glmnetUtils::cv.glmnet(biological_states~.,training_80,family="binomial",nfolds=5,alpha=1,type.measure = "auc")
 		
-        glmnet80_prediction<-predict(glmnet80,newdata=test_80,type="response")
-        glmnet80_prediction2<-predict(glmnet80,newdata=test_80,type="class")
+  glmnet80_prediction<-predict(glmnet80,newdata=test_80,type="response")
+  glmnet80_prediction2<-predict(glmnet80,newdata=test_80,type="class")
 
-        per<-data.frame(confusionMatrix(as.factor(glmnet80_prediction2),as.factor(test_80$biological_states),positive="1")$byClass)
-        per80<-cbind(rownames(per),per)
-        colnames(per80)<-c("perf","values")
+  per<-data.frame(confusionMatrix(as.factor(glmnet80_prediction2),as.factor(test_80$biological_states),positive="1")$byClass)
+  per80<-cbind(rownames(per),per)
+  colnames(per80)<-c("perf","values")
 
 
-        pred <- prediction(glmnet80_prediction, test_80$biological_states)
-        auc80<-round(unlist(performance(pred,"auc")@y.values),3)
+  pred <- prediction(glmnet80_prediction, test_80$biological_states)
+  auc80<-round(unlist(performance(pred,"auc")@y.values),3)
 
-        perf80 <- performance(pred,"tpr","fpr")
+  perf80 <- performance(pred,"tpr","fpr")
 
 	perall<-cbind(per50[,-1],per80[,-1])
 	rownames(perall)<-per50[,1]
 	colnames(perall)<-c("50","80")
-
+  
+	setwd(output_dir)
+  
 	pdf(paste("ROCR_lasso_top50_80perc_",class1,"_vs_",class2,".pdf",sep=""))
 	plot(perf50,main="CV.GLMNET") 
 	lines(perf80@x.values[[1]], perf80@y.values[[1]], col = 2)
@@ -213,7 +221,7 @@ for(i in 1:length(list_rdata_lasso)){
 	gbmmodel <- train(biological_states ~ .,data=train_mtx,method="gbm",trControl=ctrl)
 	pred <- predict(gbmmodel, newdata=test_mtx[,-1], type="prob")
 	gbm_pred_df<-data.frame(pred, test_mtx$biological_states,"gbm")
-        colnames(gbm_pred_df)<-c("no","yes","obs","Group")
+  colnames(gbm_pred_df)<-c("no","yes","obs","Group")
 
 
 	# glm
@@ -227,7 +235,7 @@ for(i in 1:length(list_rdata_lasso)){
 	nbmodel <- train(biological_states ~ .,data=train_mtx,method="nb",trControl=ctrl)
 	pred <- predict(nbmodel, newdata=test_mtx[,-1], type="prob")
 	nb_pred_df<-data.frame(pred, test_mtx$biological_states,"nb")
-        colnames(nb_pred_df)<-c("no","yes","obs","Group")
+  colnames(nb_pred_df)<-c("no","yes","obs","Group")
 
 
 	## run MLeval
@@ -240,5 +248,7 @@ for(i in 1:length(list_rdata_lasso)){
 	dev.off()
 	
 	}
-
+	
+	setwd(input_dir)
+	
 }

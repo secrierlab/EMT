@@ -5,14 +5,19 @@ library(fastshap)
 
 source("autoplot2.R")
 
+setwd('..')
+current_dir<-getwd()
+input_dir<-paste(current_dir,"/data",sep="")
+output_dir<-paste(current_dir,"/output_dir",sep="")
+
 #Parameters
-output_dir<-"/data/pseudospace/ml_for_ppt/cosmic_focal_broad_variants"
+output_dir<-output_dir
 tissue_correction = FALSE
 string_output = "cosmic_arms_focal_train_0.80"
 top_genes = 800
 #
 
-setwd("/data/pseudospace/ml_for_ppt")
+setwd(input_dir)
 
 input_ml<-fread("input_for_ml_hmm_states_3_mock_as_gd.txt",data.table=F)
 input_ml[is.na(input_ml)]<-0
@@ -65,7 +70,7 @@ for(i in 1:length(group1)){
 	print(paste(class1,class2))
 
 	input_ml2<-input_ml[input_ml$biological_states %in% c(class1,class2),c(5,6:ncol(input_ml))]
-        input_ml2$biological_states<-as.factor(gsub(gsub(input_ml2[,1],pattern=class1,replacement=1),pattern=class2,replacement=0))
+  input_ml2$biological_states<-as.factor(gsub(gsub(input_ml2[,1],pattern=class1,replacement=1),pattern=class2,replacement=0))
 
 	#
 	# Run Ranger feature selection + model 
@@ -105,7 +110,7 @@ for(i in 1:length(group1)){
 	model_rf <- ranger(biological_states ~ ., data = training,importance="impurity_corrected",classification=T)
 	rf_pvalues<-importance_pvalues(model_rf, method = "janitza")
 	variables_ok<-rf_pvalues[rf_pvalues[,2]<=0.00001,]
-        res_rf[[ti]]<-data.frame(variable=rownames(variables_ok),variables_ok)
+  res_rf[[ti]]<-data.frame(variable=rownames(variables_ok),variables_ok)
 
 	#
 	# RF: run model with best variables
@@ -114,7 +119,7 @@ for(i in 1:length(group1)){
 	training_sv<-training[,which(colnames(training)%in%c("biological_states",rownames(variables_ok)))]
 
 	model_rf_sv<-ranger(biological_states ~ ., data = training_sv,importance='impurity',num.threads=60,classification=T)
-        predictions_rf<-predict(model_rf_sv,data= test[,-1])    
+  predictions_rf<-predict(model_rf_sv,data= test[,-1])    
 	confMatrix_rf<-table(predictions_rf$prediction,test[,1])[2:1,2:1]
 
 	#source https://towardsdatascience.com/understanding-confusion-matrix-a9ad42dcfd62
@@ -125,11 +130,11 @@ for(i in 1:length(group1)){
 	#results <- confusionMatrix(data=predicted, reference=expected,positive="1")
 	#confpart <- table(predicted,expected)[2:1,2:1]
 
-        overall_per_rf<-confusionMatrix(confMatrix_rf,positive="1")$overal
-        byclass_per_rf<-confusionMatrix(confMatrix_rf,positive="1")$byClass
+  overall_per_rf<-confusionMatrix(confMatrix_rf,positive="1")$overal
+  byclass_per_rf<-confusionMatrix(confMatrix_rf,positive="1")$byClass
 
-        overall_performance_rf<-rbind(overall_performance_rf,data.frame(ti,overall_per_rf))
-        overall_bygroup_rf<-rbind(overall_bygroup_rf,data.frame(ti,byclass_per_rf))
+  overall_performance_rf<-rbind(overall_performance_rf,data.frame(ti,overall_per_rf))
+  overall_bygroup_rf<-rbind(overall_bygroup_rf,data.frame(ti,byclass_per_rf))
 
 	}
 
@@ -142,12 +147,12 @@ for(i in 1:length(group1)){
 	boxplot(t(overall_bygroup_res2),las=2)
 	dev.off()
 
-        overall_performance_res<-do.call(cbind,split(overall_performance_rf,overall_performance_rf$ti))
-        overall_perfomance_res2<-overall_performance_res[,grep(colnames(overall_performance_res),pattern="ti",invert=T)]
+  overall_performance_res<-do.call(cbind,split(overall_performance_rf,overall_performance_rf$ti))
+  overall_perfomance_res2<-overall_performance_res[,grep(colnames(overall_performance_res),pattern="ti",invert=T)]
 
-        pdf(paste("RF_HMM_nstates3_mock",class1,"vs",class2,"tissue",tissue_correction,ncol(trainIndex),"topgenes",top_genes,"performance.pdf",sep="."))
-        boxplot(t(overall_perfomance_res2),las=2)
-        dev.off()
+  pdf(paste("RF_HMM_nstates3_mock",class1,"vs",class2,"tissue",tissue_correction,ncol(trainIndex),"topgenes",top_genes,"performance.pdf",sep="."))
+  boxplot(t(overall_perfomance_res2),las=2)
+  dev.off()
 
 	df_coef2<-do.call(rbind,res_rf)
 	df_coef2<-df_coef2[grep(df_coef2[,1],pattern=paste(c("Intercept","tumors"),collapse="|"),invert=T),]
@@ -168,28 +173,26 @@ for(i in 1:length(group1)){
 	# Shap analysis on the predicted genes
 	#
 	
-        train_index <- sample(1:nrow(input_ml2), 0.8 * nrow(input_ml2))
-         
-        train_data<-input_ml2[train_index,which(colnames(input_ml2)%in%c("biological_states",as.character(features_selected_rf$variables)))]
-        test_data<-input_ml2[-train_index,which(colnames(input_ml2)%in%c("biological_states",as.character(features_selected_rf$variables)))]
+  train_index <- sample(1:nrow(input_ml2), 0.8 * nrow(input_ml2))
+  
+  train_data<-input_ml2[train_index,which(colnames(input_ml2)%in%c("biological_states",as.character(features_selected_rf$variables)))]
+  test_data<-input_ml2[-train_index,which(colnames(input_ml2)%in%c("biological_states",as.character(features_selected_rf$variables)))]
         
-        model_rf <- ranger(biological_states ~ . , data = train_data,probability = TRUE)
+  model_rf <- ranger(biological_states ~ . , data = train_data,probability = TRUE)
              
-        # see https://pbiecek.github.io/breakDown/articles/break_randomForest.html
+  pfun <- function(object, newdata) { 
+  predict(object, data = newdata)$predictions[,2]
+  }
 
-        pfun <- function(object, newdata) { 
-        predict(object, data = newdata)$predictions[,2]
-        }
-
-        exp_rf<- fastshap::explain(model_rf, X = test_data[,-1], pred_wrapper = pfun, nsim = 10,.parallel = TRUE)
+  exp_rf<- fastshap::explain(model_rf, X = test_data[,-1], pred_wrapper = pfun, nsim = 10,.parallel = TRUE)
 
 	pdf(paste("RF_HMM_nstates3_mock",class1,"vs",class2,"tissue",tissue_correction,ncol(trainIndex),"topgenes",top_genes,"top_markers_feature_selected.SHAP.pdf",sep="."))
 	p3<-autoplot2(exp_rf,type="contribution")
 	print(p3)
-        dev.off()
+  dev.off()
 	
 	save(list=c("res_rf","overall_performance_rf","overall_bygroup_rf","features_selected_rf"),
-	     file=paste("RF_HMM_nstates3_mock",class1,"vs",class2,"tissue",tissue_correction,ncol(trainIndex),"topgenes",top_genes,string_output,"RData",sep="."))
+  file=paste("RF_HMM_nstates3_mock",class1,"vs",class2,"tissue",tissue_correction,ncol(trainIndex),"topgenes",top_genes,string_output,"RData",sep="."))
 
 
 
