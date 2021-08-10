@@ -6,8 +6,13 @@ library(ggplot2)
 #
 # Upload the data from Swiatkowska
 #
+setwd('..')
+current_dir<-getwd()
+input_dir<-paste(current_dir,"/data",sep="")
+output_dir<-paste(current_dir,"/output_dir",sep="")
 
-setwd("/home/guidantoniomt/pseudospace/Schaller_mouse_validation")
+setwd(input_dir)
+
 tab_hits<-read.xlsx("mmc4.xlsx",sheet=3)
 
 human = useMart("ensembl", dataset = "hsapiens_gene_ensembl")
@@ -25,8 +30,6 @@ tab_hit_list<-split.default(tab_hits_for_split, rep(1:48, each = 3))
 #
 # Upload the biomarkers
 #
-
-setwd("/home/guidantoniomt/pseudospace/ml_for_ppt/cosmic_focal_broad_variants")
 
 getFeaturesSS<-function(res_lasso,ss=800){
   
@@ -152,7 +155,7 @@ for(thl in 1:length(tab_hit_list)){
 ALL_TF_RES2<-ALL_TF_RES[-which(ALL_TF_RES$TF%in%c("0dCtr","4dCtr")),]
 ALL_TF_RES2$TF<-toupper(ALL_TF_RES2$TF)
 
-setwd("/home/guidantoniomt/pseudospace/Schaller_mouse_validation")
+setwd(output_dir)
 
 pdf("Schaller_mouse_validation_CNV.July.pdf")
 

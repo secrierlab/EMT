@@ -8,13 +8,18 @@ library(ggrepel)
 library(RColorBrewer)
 library(patchwork)
 
+setwd('..')
+current_dir<-getwd()
+input_dir<-paste(current_dir,"/data",sep="")
+output_dir<-paste(current_dir,"/output_dir",sep="")
+
+setwd(input_dir)
+
 RadarTheme<-theme(
   panel.background = element_rect(fill = "white", colour = "white", linetype = "black"),
   panel.grid.major = element_line(size = 0.25, linetype = 'black', colour = "white"), 
   panel.grid.minor = element_line(size = 0, linetype = 'black',colour = "black"))
 
-
-setwd("/home/data/pseudospace/ml_for_ppt/cosmic_focal_broad_variants")
 
 getFeaturesSS<-function(res_lasso,ss=800){
   
@@ -119,9 +124,7 @@ names(list_features)<-c("mes_vs_epi","hemt_vs_epi","mes_vs_mix","common","luad",
 # Upload the CRISPR data
 #
 
-setwd("/home/data/pseudospace/CCLE")
-
-tab_sampleinfo<-fread("/home/data/pseudospace/depmap/primary-screen-cell-line-info.csv",data.table=F)
+tab_sampleinfo<-fread("primary-screen-cell-line-info.csv",data.table=F)
 
 # (DepMap 21Q2 Public+Score, CERES)
 
@@ -156,6 +159,8 @@ groups_to_consider<-vector(mode="list",2)
 groups_to_consider[[1]]<-c("mes_vs_epi","hemt_vs_epi","mes_vs_mix","common_all")
 groups_to_consider[[2]]<-c("luad","brca")
 names(groups_to_consider)<-c("ML","LUAD_BREAST")
+
+setwd(output_dir)
 
 for(gtc in 1:length(groups_to_consider)){
   
@@ -201,7 +206,6 @@ for(gtc in 1:length(groups_to_consider)){
   
   pdf(paste(output_string,"_comparisons_CRISPR_gene_effect.CNV.July.pdf",sep=""),width=10)
   
-  # print((ptissue/ph)+plot_layout(heights=c(0.20,0.80)))
   print(ph|p_annotation|pgenes)+plot_layout(widths=c(0.80,0.10,0.10))
   print(pgenes)
   print(ptissue)

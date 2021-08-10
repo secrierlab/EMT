@@ -8,13 +8,19 @@ library(ggrepel)
 library(RColorBrewer)
 library(patchwork)
 
+setwd('..')
+current_dir<-getwd()
+input_dir<-paste(current_dir,"/data",sep="")
+output_dir<-paste(current_dir,"/output_dir",sep="")
+
+setwd(input_dir)
+
 RadarTheme<-theme(panel.background=element_blank(),
                   legend.position="bottom",legend.title=element_blank(),legend.direction="vertical",
                   axis.text.x = element_blank(),
                   axis.line.x=element_line(size=0.5),
                   panel.grid.major=element_line(size=0.3,linetype = 2,colour="grey"))
 
-setwd("/home/data/pseudospace/ml_for_ppt/cosmic_focal_broad_variants")
 getFeaturesSS<-function(res_lasso,ss=800){
   
   df_coef2<-do.call(rbind,res_lasso)
@@ -103,25 +109,25 @@ common_between_three_groups<-Reduce(intersect,list_common_all)
 # Upload the biomarkers
 #
 
-tab_sampleinfo<-fread("/home/data/pseudospace/depmap/primary-screen-cell-line-info.csv",data.table=F)
+tab_sampleinfo<-fread("primary-screen-cell-line-info.csv",data.table=F)
 
 #
 # Upload MET500
 #
 
-brain_metmap500<-read.xlsx("/home/data/pseudospace/CCLE/MetMap500_met_potential.xlsx",sheet = 1)
+brain_metmap500<-read.xlsx("MetMap500_met_potential.xlsx",sheet = 1)
 colnames(brain_metmap500)[1]<-"cell_line"
 
-lung_metmap500<-read.xlsx("/home/data/pseudospace/CCLE/MetMap500_met_potential.xlsx",sheet = 2)
+lung_metmap500<-read.xlsx("MetMap500_met_potential.xlsx",sheet = 2)
 colnames(lung_metmap500)[1]<-"cell_line"
 
-liver_metmap500<-read.xlsx("/home/data/pseudospace/CCLE/MetMap500_met_potential.xlsx",sheet = 3)
+liver_metmap500<-read.xlsx("MetMap500_met_potential.xlsx",sheet = 3)
 colnames(liver_metmap500)[1]<-"cell_line"
 
-bone_metmap500<-read.xlsx("/home/data/pseudospace/CCLE/MetMap500_met_potential.xlsx",sheet = 4)
+bone_metmap500<-read.xlsx("MetMap500_met_potential.xlsx",sheet = 4)
 colnames(bone_metmap500)[1]<-"cell_line"
 
-kidney_metmap500<-read.xlsx("/home/data/pseudospace/CCLE/MetMap500_met_potential.xlsx",sheet = 5)
+kidney_metmap500<-read.xlsx("MetMap500_met_potential.xlsx",sheet = 5)
 colnames(kidney_metmap500)[1]<-"cell_line"
 
 met_potential_list<-vector(mode="list",length=5)
@@ -144,7 +150,7 @@ codes_to_use_metmap<-tab_sampleinfo[which(tab_sampleinfo[,3]%in%met_pot_all2$cel
 # Load cna data CCLE
 #
 
-tab_cna_ccle<-fread(file="/home/data/pseudospace/CCLE/CCLE_gene_cn.csv",header=T,fill = TRUE,data.table=F)
+tab_cna_ccle<-fread(file="CCLE_gene_cn.csv",header=T,fill = TRUE,data.table=F)
 tab_cna_ccle_subselect<-tab_cna_ccle[tab_cna_ccle[,1]%in%codes_to_use_metmap,]
 colnames(tab_cna_ccle_subselect)<-gsub(sapply(strsplit(colnames(tab_cna_ccle_subselect),split="\\("),"[[",1),pattern=" ",replacement="")
 colnames(tab_cna_ccle_subselect)[1]<-"samples"
@@ -171,7 +177,7 @@ list_features[[6]]<-c("MDS2_focal","PAX7_focal","PRDM2_focal","ID3_focal","ARID1
 # names(list_features)<-c("mes_vs_epi","hemt_vs_epi","mes_vs_mix","common","common_all","luad","breast")
 names(list_features)<-c("mes_vs_epi","hemt_vs_epi","mes_vs_mix","common","luad","breast")
 
-setwd("/home/data/pseudospace/CCLE")
+setwd(output_dir)
 
 stat.test_sig_all<-data.frame()
 stat.test_sig_all_pancancer<-data.frame()
@@ -412,38 +418,7 @@ for(i in 1:length(list_features)){
       input_boxplot3<-input_boxplot2[which(input_boxplot2$primary_tissue%in%tis & input_boxplot2$genes%in% sig_genes_tissue2),]
       # input_boxplot3$value2<-ifelse(input_boxplot3$value2==1,"withCNA","withoutCNA")
       input_boxplot3$value2<-factor(input_boxplot3$value2,levels=c("withoutCNA","withCNA"))
-      
-  # for(g in sig_genes_tissue2){
-  #   
-  #     input_cont<-input_boxplot3[which(input_boxplot3$genes%in%g),]
-  #     input_cont$met_potential_discr<-rep("fill",nrow(input_cont))
-  #     input_cont[which(input_cont$mean<=-4),"met_potential_discr"]<-"non_metastatic"
-  #     input_cont[which(input_cont$mean>-4 & input_cont$mean < -2),"met_potential_discr"]<-"weakly_metastatic"
-  #     input_cont[which(input_cont$mean>=-2),"met_potential_discr"]<-"metastatic"
-  #     
-  #     input_cont$value2<-factor(input_cont$value2,levels=c("withoutCNA","withCNA"))
-  #       
-  #     if(length(unique(input_cont$met_potential_discr))==3){
-  #       
-  #       contingency_table<-table(input_cont$met_potential_discr,input_cont$value2)[c("metastatic","weakly_metastatic","non_metastatic"),c("withCNA","withoutCNA")]
-  #       
-  #       contingency_table2<-rbind(colSums(contingency_table[c("metastatic","weakly_metastatic"),]),contingency_table["non_metastatic",])
-  #       rownames(contingency_table2)<-c("metastatic","non_metastatic")
-  #       
-  #     }else{
-  #       
-  #       contingency_table<-table(input_cont$met_potential_discr,input_cont$value2)[unique(input_cont$met_potential_discr),c("withCNA","withoutCNA")]
-  #       contingency_table2<-contingency_table
-  #       
-  #     }
-  #     
-  #   
-  #     print(assoc(contingency_table, shade = TRUE, las=3,main=paste("not collapsed met.pot:",g)))
-  #     
-  #     # print(assoc(contingency_table2, shade = TRUE, las=3,main=paste("collapsed met.pot:",g)))
-  # 
-  # }
-  
+
       stat.test3 <- input_boxplot3 %>%
         group_by(genes) %>%
         wilcox_test(mean ~ value2)
