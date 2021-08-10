@@ -282,7 +282,7 @@ resHMM_for_heatmap<-cbind(samples=rownames(TCGA_GEXP_ALL_sort),HMMpost)
 	pdf(paste("HMM_pseudotime_vs_scores_emt_mock",nstates,"pdf",sep="."),width=12,pointsize=12)
 	p<-ggplot(pseudospace_with_score, aes(x=mock, y=score_emt,color=states)) +
 	geom_point(shape=18,size=2)+scale_x_reverse()+ scale_color_manual(values=c('#56b4e9','#e69f00','#ee0c0c'))+geom_smooth(method = "lm", formula = y ~ poly(x, 10),se=TRUE, linetype="dashed",color="blue")+geom_hline(yintercept=0, linetype="dashed", color = "black")+ theme_classic()
-	p
+	print(p)
 	dev.off()
 
 	#
