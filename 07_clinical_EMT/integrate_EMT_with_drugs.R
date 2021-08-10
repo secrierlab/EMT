@@ -5,6 +5,12 @@ library(reshape)
 library(ggrepel)
 library(RColorBrewer)
 library(wesanderson)
+
+setwd('..')
+current_dir<-getwd()
+input_dir<-paste(current_dir,"/data",sep="")
+output_dir<-paste(current_dir,"/output_dir",sep="")
+
 #
 # Define some functions to use 
 #
@@ -46,9 +52,10 @@ getIC50fromgenomicfeatures<-function(input_anova,markers_to_consider,pval_thr=0.
 #
 # Integrate EMT with drugs response
 #
+setwd(input_dir)
 
-gdsc_table_with_emt<-read.delim(file="/home/guidantoniomt/pseudospace/gdsc/GDSC_on_pseudotime_EMT_MCF_withEMTscores.txt")
-table_cl_drugs_ic50<-read.xlsx("/home/guidantoniomt/pseudospace/gdsc/GDSC2_fitted_dose_response_25Feb20.xlsx",sheet=1)
+gdsc_table_with_emt<-read.delim(file="GDSC_on_pseudotime_EMT_MCF_withEMTscores.txt")
+table_cl_drugs_ic50<-read.xlsx("GDSC2_fitted_dose_response_25Feb20.xlsx",sheet=1)
 table(table_cl_drugs_ic50$TCGA_DESC)
 
 #get the cell line in common between those one used to compute the EMT score and IC50 data
@@ -66,6 +73,8 @@ emt_table<-merge(gdsc_table_with_emt[,-2],table_temp_drug,by.x="gdsc_ID",by.y="C
 emt_table2<-emt_table[,c(3,2)]
 
 require(ggpubr)
+
+setwd(output_dir)
 
 pdf("boxplot_emt_score_bytissue.pdf",width=15)
 
@@ -160,38 +169,12 @@ ggrid2<-ggplot(melt_df_IC50_sig_drugs, aes(x = LNIC50, y = variable, fill = fact
 print(plot_grid(cdat_sp,ggrid,width=c(0.2,0.8),nrow=1))
 
 print(plot_grid(cdat_sp,ggrid2,width=c(0.2,0.8),nrow=1))
-# 
-# melt_df_IC50_sig_drugs_binary<-data.frame()
-# 
-# for(drug_for_plot in unique(melt_df_IC50_sig_drugs[,1])){
-#   
-#   temp_df<-melt_df_IC50_sig_drugs[melt_df_IC50_sig_drugs[,1]%in%drug_for_plot,]
-#   temp_df$binary<-ifelse(temp_df[,2]>=mean(temp_df[,2]),"r","s")
-# 
-#   # temp_df2<-cbind(drug_for_plot,data.frame(table(temp_df$binary)/sum(table(temp_df$binary))))
-#   temp_df2<-cbind(drug_for_plot,data.frame(table(temp_df$binary)))
-#   
-#   colnames(temp_df2)<-c("drugs","status","Freq")
-#                            
-#   melt_df_IC50_sig_drugs_binary<-rbind(melt_df_IC50_sig_drugs_binary,temp_df2)  
-# }
-# 
-# melt_df_IC50_sig_drugs_binary$Freq<-as.numeric(melt_df_IC50_sig_drugs_binary$Freq)
-# 
-# p<-ggplot(melt_df_IC50_sig_drugs_binary, aes(x = drugs, y = Freq, fill = status)) +
-#   geom_col(position = "fill")
-# 
 
 dev.off()
 
 #
 # Generalized linear model with Y=emt and predictors are the drugs
 #
-
-# How to binarize the IC50 values:
-# https://www.nature.com/articles/s41598-019-50720-0#Sec10
-# https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5310525/
-
 
 list_drugs_for_cor<-colnames(emt_ic50_lm[,-1])
 
@@ -208,10 +191,7 @@ for(current_drug in list_drugs_for_cor){
   current_drug_df<-emt_ic50_lm[,colnames(emt_ic50_lm)%in%c("emt_score",current_drug)]
   colnames(current_drug_df)[2]<-"drug"
   current_drug_df$drug<-ifelse(current_drug_df$drug>=median(current_drug_df$drug),1,0)
-  # 
-  # ggplot(current_drug_df, aes(x=emt_score, y=drug)) + geom_point() + 
-  #   stat_smooth(method="glm", method.args=list(family="binomial"), se=TRUE)
-  
+
   plot(current_drug_df$drug ~ current_drug_df$emt_score )
   
   if(length(unique(current_drug_df$drug))==2){
@@ -223,8 +203,7 @@ for(current_drug in list_drugs_for_cor){
   glm_model<-glm(glm_formula,current_drug_df, family = "binomial",control = list(maxit = 100))
   
   nullmod <- glm(drug~1,current_drug_df, family="binomial",control = list(maxit = 100))
-  # https://thestatsgeek.com/2014/02/08/r-squared-in-logistic-regression/
-  # https://stats.stackexchange.com/questions/8511/how-to-calculate-pseudo-r2-from-rs-logistic-regression
+  
   rsquared<-as.numeric(1-logLik(glm_model)/logLik(nullmod))
   rsquared_all_glm<-c(rsquared_all_glm,rsquared)
   
@@ -267,7 +246,7 @@ results_glm2<-results_glm[results_glm$padjust<=0.001,]
 # Now integrate the genomic features
 #
 
-setwd("/home/guidantoniomt/pseudospace/ml_for_ppt/cosmic_focal_broad_variants")
+setwd(input_dir)
 
 getFeaturesSS<-function(res_lasso,ss=800){
   
@@ -299,7 +278,7 @@ getCoefSS<-function(res_lasso,features_to_select){
   
 }
 
-setwd("/home/guidantoniomt/pseudospace/ml_for_ppt/cosmic_focal_broad_variants")
+setwd(input_dir)
 
 load("HMM_nstates3_mock.mes.vs.epi.tissue.TRUE.1000.cosmic_arms_focal.RData")
 
@@ -341,6 +320,8 @@ markers_to_consider_mes_vs_epi <- setdiff(all_markers_mes_vs_epi,all_markers_pem
 emt_table <- gdsc_table_with_emt
 
 tab_anova_ic50_mes_vs_epi<-getIC50fromgenomicfeatures(input_anova,markers_to_consider_mes_vs_epi,pval_thr=0.01)
+
+setwd(output_dir)
 
 pdf("IC50_mutations_mes_vs_epi.pval0.01.pdf")
 scatterplot_IC50_gf(tab_anova_ic50_mes_vs_epi,xmin_legend=1,ymin_legend=2,min_y=2,max_y=4,list_tissues)

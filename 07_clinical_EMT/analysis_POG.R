@@ -11,6 +11,13 @@ library(plyr)
 library(survival)
 library(survminer)
 
+folder_analysis<-getwd()
+
+setwd('..')
+current_dir<-getwd()
+input_dir<-paste(current_dir,"/data",sep="")
+output_dir<-paste(current_dir,"/output_dir",sep="")
+
 plotSignificantDrugsGenes<-function(matrix_drugs_genes_pvalue_aov,input_nested_rid,class1,class2,therapy_table){
   
   for(i in 1:nrow(matrix_drugs_genes_pvalue_aov)){
@@ -70,7 +77,7 @@ plotSignificantDrugsGenes<-function(matrix_drugs_genes_pvalue_aov,input_nested_r
 #
 #  POG570 analysis
 #
-setwd("/home/guidantoniomt/pseudospace/HMM")
+setwd(input_dir)
 markers_genes_read<-read.table(file="EMT_and_pEMT_markers.txt",header=T)
 
 mart <- useMart(biomart = "ensembl", dataset = "hsapiens_gene_ensembl")
@@ -78,7 +85,7 @@ IDs <- getBM(attributes = c("ensembl_gene_id","hgnc_symbol"),filters = "hgnc_sym
 
 markers_genes_read2<-merge(markers_genes_read,IDs,by.x="genes",by.y="hgnc_symbol")
 
-setwd("/home/guidantoniomt/pseudospace/POG570")
+setwd(input_dir)
 
 tab_exp<-fread("POG570_TPM_expression.txt.gz",header=T)
 tab_exp_markers<-merge(markers_genes_read2,tab_exp,by.x="ensembl_gene_id",by.y="genes")
@@ -140,23 +147,25 @@ df_pts_before_after_treatment$On_treatment_at_biopsy<-factor(df_pts_before_after
 
 table(df_pts_before_after_treatment[,1],df_pts_before_after_treatment$On_treatment_at_biopsy)
 
+setwd(output_dir)
+
 pdf("boxplot_emt_before_after_treatment.pdf")
 
-  p2_sig<-ggplot(df_pts_before_after_treatment,aes(x=On_treatment_at_biopsy, y=EMT_score))+
-    geom_boxplot()+geom_jitter(width=0.1, aes(color = EMT_score))+scale_colour_gradient2(low = "orange2", mid = "grey", high = "darkmagenta", midpoint = 0)+
-    theme(text = element_text(size=8),legend.position="top")+theme_bw()+ ylab("EMT score")
-  p3<-p2_sig+stat_compare_means(comparisons = list(c("after_treatment","before_treatment")),method="wilcox.test")
-  print(p3)
+p2_sig<-ggplot(df_pts_before_after_treatment,aes(x=On_treatment_at_biopsy, y=EMT_score))+
+geom_boxplot()+geom_jitter(width=0.1, aes(color = EMT_score))+scale_colour_gradient2(low = "orange2", mid = "grey", high = "darkmagenta", midpoint = 0)+
+theme(text = element_text(size=8),legend.position="top")+theme_bw()+ ylab("EMT score")
+p3<-p2_sig+stat_compare_means(comparisons = list(c("after_treatment","before_treatment")),method="wilcox.test")
+print(p3)
   
-  list_drugs<-unique(df_pts_before_after_treatment$Drug_name)
+list_drugs<-unique(df_pts_before_after_treatment$Drug_name)
   
-  for(lsds in list_drugs){
+for(lsds in list_drugs){
     
   sub_drug<-df_pts_before_after_treatment[df_pts_before_after_treatment$Drug_name%in%lsds,]
   
   p2_sig<-ggplot(sub_drug,aes(x=On_treatment_at_biopsy, y=EMT_score))+
-    geom_boxplot()+geom_jitter(width=0.1, aes(color = EMT_score))+scale_colour_gradient2(low = "orange2", mid = "grey", high = "darkmagenta", midpoint = 0)+
-    theme(text = element_text(size=8),legend.position="top")+theme_bw()+ ylab("EMT score")
+  geom_boxplot()+geom_jitter(width=0.1, aes(color = EMT_score))+scale_colour_gradient2(low = "orange2", mid = "grey", high = "darkmagenta", midpoint = 0)+
+  theme(text = element_text(size=8),legend.position="top")+theme_bw()+ ylab("EMT score")
   p3<-p2_sig+stat_compare_means(comparisons = list(c("after_treatment","before_treatment")),method="wilcox.test")
   print(p3+ggtitle(lsds))
   
@@ -164,52 +173,6 @@ pdf("boxplot_emt_before_after_treatment.pdf")
 
 dev.off()
 
-
-# 
-#  No deprecated
-# 
-
-# pdf("boxplot_emt_before_after_treatmentWithStartAndEndTreatment.pdf")
-# 
-# dfSEtreat<-input_for_chart[,colnames(df_pts_before_after_treatment)%in%c("Patient_ID","Drug_name","EMT_score","Therapy_start_date","Therapy_end_or_biopsy_date")]
-# # in some cases the start and the end of the treatment is the same, I exclude this from the analysis
-# dfSEtreat2<-dfSEtreat[-which(dfSEtreat[,4]==dfSEtreat[,5]),]
-# dfSEtreat2$Therapy_start_date<-"start"
-# dfSEtreat2$Therapy_end_or_biopsy_date<-"end"
-# 
-# 
-# dfSEtreat2_start<-dfSEtreat2[which(dfSEtreat2$Therapy_start_date%in%"start"),-5]
-# colnames(dfSEtreat2_start)[4]<-"time"
-# 
-# dfSEtreat2_end<-dfSEtreat2[which(dfSEtreat2$Therapy_end_or_biopsy_date%in%"end"),-4]
-# colnames(dfSEtreat2_end)[4]<-"time"
-# 
-# dfSEtreat2_final<-rbind(dfSEtreat2_start,dfSEtreat2_end)
-# 
-# dfSEtreat2_final$time<-factor(dfSEtreat2_final$time,level=c("start","end"))
-# 
-# p2_sig<-ggplot(dfSEtreat2_final,aes(x=time, y=EMT_score))+
-#   geom_boxplot()+geom_jitter(width=0.1, aes(color = EMT_score))+scale_colour_gradient2(low = "orange2", mid = "grey", high = "darkmagenta", midpoint = 0)+
-#   theme(text = element_text(size=8),legend.position="top")+theme_bw()+ ylab("EMT score")
-# p3<-p2_sig+stat_compare_means(comparisons = list(c("start","end")),method="wilcox.test")
-# print(p3)
-# 
-# list_drugs<-unique(dfSEtreat2_final$Drug_name)
-# 
-# for(lsds in list_drugs){
-#   
-#   sub_drug<-dfSEtreat2_final[dfSEtreat2_final$Drug_name%in%lsds,]
-#   
-#   p2_sig<-ggplot(sub_drug,aes(x=time, y=EMT_score))+
-#     geom_boxplot()+geom_jitter(width=0.1, aes(color = EMT_score))+scale_colour_gradient2(low = "orange2", mid = "grey", high = "darkmagenta", midpoint = 0)+
-#     theme(text = element_text(size=8),legend.position="top")+theme_bw()+ ylab("EMT score")
-#   p3<-p2_sig+stat_compare_means(comparisons = list(c("start","end")),method="wilcox.test")
-#   print(p3+ggtitle(lsds))
-#   
-# }
-# 
-# dev.off()
-# 
 
 
 
@@ -246,16 +209,16 @@ pdf("cor_POG_sig.pdf",width = 15,height=4)
 # 
 
 cdat_sp_sig <- ggplot(dfcorsig, aes(x = 1, y = drugs,size = cor,color=pval_log)) +
-        geom_point() + scale_colour_viridis(option = "plasma",direction = -1)+
-        theme(legend.position="right",panel.grid.major = element_blank(), panel.grid.minor = element_blank(),panel.background = element_blank(), axis.line = element_line(colour = "black"))+xlab("Correlation")+ ggtitle("Correlation")
+geom_point() + scale_colour_viridis(option = "plasma",direction = -1)+
+theme(legend.position="right",panel.grid.major = element_blank(), panel.grid.minor = element_blank(),panel.background = element_blank(), axis.line = element_line(colour = "black"))+xlab("Correlation")+ ggtitle("Correlation")
 
 df_long_ther_cor<-input_for_chart[input_for_chart$Drug_name%in%dfcorsig[,1],]
 
 df_long_ther_cor$Drug_name<-factor(df_long_ther_cor$Drug_name,levels=dfcorsig[,1])
 
 p2_sig<-ggplot(df_long_ther_cor,aes(x=Drug_name, y=logmonth))+
-  geom_boxplot()+geom_jitter(width=0.1, aes(color = EMT_score))+scale_colour_gradient2(low = "orange2", mid = "grey", high = "darkmagenta", midpoint = 0)+
-  theme(text = element_text(size=8),legend.position="top")+coord_flip()+theme_bw()+ ylab("Months of Treatment (months), log(months+1,2)")+ ggtitle("Boxplot")
+geom_boxplot()+geom_jitter(width=0.1, aes(color = EMT_score))+scale_colour_gradient2(low = "orange2", mid = "grey", high = "darkmagenta", midpoint = 0)+
+theme(text = element_text(size=8),legend.position="top")+coord_flip()+theme_bw()+ ylab("Months of Treatment (months), log(months+1,2)")+ ggtitle("Boxplot")
 
 print(plot_grid(cdat_sp_sig,p2_sig,width=c(0.2,0.8),nrow=1))
 
@@ -267,8 +230,8 @@ dev.off()
 pdf("cor_POG.pdf",width = 15,height=10)
 
 cdat_sp <- ggplot(dfcor, aes(x = 1, y = drugs,size = cor,color=pval_log)) +
-  geom_point() + scale_colour_viridis(option = "plasma",direction = -1)+
-  theme(legend.position="right",panel.grid.major = element_blank(), panel.grid.minor = element_blank(),panel.background = element_blank(), axis.line = element_line(colour = "black"))+xlab("Correlation")+ ggtitle("Correlation")
+geom_point() + scale_colour_viridis(option = "plasma",direction = -1)+
+theme(legend.position="right",panel.grid.major = element_blank(), panel.grid.minor = element_blank(),panel.background = element_blank(), axis.line = element_line(colour = "black"))+xlab("Correlation")+ ggtitle("Correlation")
 
 df_long_ther_cor<-input_for_chart[input_for_chart$Drug_name%in%dfcor[,1],]
 
@@ -289,8 +252,8 @@ p1<-ggplot(input_for_chart, aes(x = long_treatment, y = Drug_name)) + geom_densi
 print(p1)
 
 p2<-ggplot(input_for_chart,aes(x=Drug_name, y=logmonth))+
-  geom_boxplot()+geom_jitter(width=0.1, aes(color = EMT_score))+scale_colour_gradient2(low = "orange2", mid = "grey", high = "darkmagenta", midpoint = 0)+
-  theme(text = element_text(size=8))+coord_flip()+theme_bw()+ theme(legend.position="top")+labs(title="Boxplots")
+geom_boxplot()+geom_jitter(width=0.1, aes(color = EMT_score))+scale_colour_gradient2(low = "orange2", mid = "grey", high = "darkmagenta", midpoint = 0)+
+theme(text = element_text(size=8))+coord_flip()+theme_bw()+ theme(legend.position="top")+labs(title="Boxplots")
 
 print(p2)
 
@@ -305,7 +268,7 @@ pval<-round(coef(summary(model))[2,4],3)
 rsquare<-round(summary(model)$r.squared,3)
   
 psm<-ggplot(input_for_chart[input_for_chart$Drug_name%in%i,], aes(x=EMT_score, y=long_treatment))+
-  geom_point()+geom_smooth(method=lm, se = TRUE)+theme_bw()+ylab("months (log2)")+xlab(paste("EMT score"))+ggtitle(paste(i,",","R2:",rsquare,"p-value:",pval))
+geom_point()+geom_smooth(method=lm, se = TRUE)+theme_bw()+ylab("months (log2)")+xlab(paste("EMT score"))+ggtitle(paste(i,",","R2:",rsquare,"p-value:",pval))
 
 print(psm)
 
@@ -334,11 +297,11 @@ for(i in list_drugs){
   
   if(length(unique(input_aov[,2]))!=1){
     
-    res.aov <- aov(long_treatment ~ hmm_states, data = input_aov)
-    pval<-summary(res.aov)[[1]][[1,"Pr(>F)"]]
+  res.aov <- aov(long_treatment ~ hmm_states, data = input_aov)
+  pval<-summary(res.aov)[[1]][[1,"Pr(>F)"]]
     
-    pval_aov_all<-c(pval_aov_all,pval)
-    out_drugs<-c(out_drugs,i)
+  pval_aov_all<-c(pval_aov_all,pval)
+  out_drugs<-c(out_drugs,i)
     
   }
   
@@ -362,8 +325,8 @@ for(si in significant_drugs){
 my_comparisons<-list(c("mes","epi"),c("epi","hEMT"),c("mes","hEMT"))
   
 p1<-ggviolin(input_boxplot[input_boxplot$Drug_name%in%si,], x = "hmm_states", y = "long_treatment", fill = "hmm_states",
-             palette = c("#56b4e9", "#E69f00", "#EE0C0C"),
-             add = "boxplot", add.params = list(fill = "white"))+
+  palette = c("#56b4e9", "#E69f00", "#EE0C0C"),
+  add = "boxplot", add.params = list(fill = "white"))+
   stat_compare_means(comparisons = my_comparisons,method="wilcox.test" ,label = "p.signif")+ggtitle(si)
 
 print(p1)
@@ -375,6 +338,9 @@ dev.off()
 # 
 # Significant groups
 # 
+
+setwd(input_dir)
+
 load("Pseudotime_POG_on_MCF.RData")
 
 POG_pseudotime_EMT_metpot_HMM$hmm_states<-gsub(POG_pseudotime_EMT_metpot_HMM$hmm_states,pattern = "1",replacement="epi")
@@ -384,6 +350,8 @@ POG_pseudotime_EMT_metpot_HMM$hmm_states<-gsub(POG_pseudotime_EMT_metpot_HMM$hmm
 my_comparisons<-list(c("mes","epi"),c("epi","hEMT"),c("mes","hEMT"))
 
 print(length(which(POG_pseudotime_EMT_metpot_HMM$PRIMARY_SITE%in%c("Blood","Brain"))))
+
+setwd(output_dir)
 
 for(myc in 1:length(my_comparisons)){
 
@@ -408,7 +376,7 @@ for(si in unique(input_for_chart$Drug_name)){
   input_comp$hmm_states<-as.factor(input_comp$hmm_states)
     
   p1<-ggplot(input_comp, aes(x=hmm_states, y=long_treatment, fill=hmm_states)) +
-    geom_boxplot()+geom_point(aes(fill = factor(hmm_states)), size = 2, shape = 21, position = position_jitterdodge())+theme_bw()+ggtitle(si)
+  geom_boxplot()+geom_point(aes(fill = factor(hmm_states)), size = 2, shape = 21, position = position_jitterdodge())+theme_bw()+ggtitle(si)
   
   print(p1+stat_compare_means(comparisons = list(groups_for_stat),method="wilcox.test"))
 }
@@ -420,6 +388,8 @@ dev.off()
 #  Do the overall survival analysis only for the patients in the three groups
 # 
 
+setwd(input_dir)
+
 surv_table<- read.xlsx(xlsxFile = "Table_S2_Treatment.xlsx", sheet = 3)
 surv_table2<-merge(surv_table,POG_pseudotime_EMT_metpot_HMM,by.x="Patient_ID",by.y="POG_ID")
 
@@ -428,6 +398,8 @@ surv_table2$hmm_states<-gsub(surv_table2$hmm_states,pattern = "2",replacement="m
 surv_table2$hmm_states<-gsub(surv_table2$hmm_states,pattern = "3",replacement="hEMT")
 
 sfit <- survfit(Surv(as.numeric(surv_table2$Overall_survival_days)/365, event = surv_table2$Alive_0_Death_1) ~ surv_table2$hmm_states,data=surv_table2)
+
+setwd(output_dir)
 
 pdf("HMM_POG570.overallsurvival.pdf")
 p4<-ggsurvplot(sfit, conf.int=FALSE, pval=TRUE, risk.table=TRUE,
@@ -442,7 +414,8 @@ dev.off()
 #  Mutational data: look at biomarkers discovered
 # 
 
-cosmic_table<-read.csv(file="/home/guidantoniomt/pseudospace/ml_for_ppt/Census_allMon Aug 17 13_43_26 2020.csv",stringsAsFactors=F)
+setwd(input_dir)
+cosmic_table<-read.csv(file="Census_allMon Aug 17 13_43_26 2020.csv",stringsAsFactors=F)
 genes_to_consider<-cosmic_table[,1]
 
 # Import the mutations in PO570
@@ -475,6 +448,8 @@ matrix_patients_for_genes2<-data.frame(patientID=rownames(matrix_patients_for_ge
 matrix_patients_for_genes2_with_hmm<-merge(POG_pseudotime_EMT_metpot_HMM[,c(1,4)],matrix_patients_for_genes2,by.x="POG_ID",by.y="patientID")
 
 list_comparisons<-list(c("mes","epi"),c("hEMT","epi"))
+
+setwd(output_dir)
 
 for(i in 1:length(list_comparisons)){
   

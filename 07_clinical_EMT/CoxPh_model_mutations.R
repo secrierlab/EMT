@@ -5,7 +5,14 @@ library(survival)
 library(survminer)
 library(readxl)
 
-setwd("/home/guidantoniomt/pseudospace/HMM")
+folder_analysis<-getwd()
+
+setwd('..')
+current_dir<-getwd()
+input_dir<-paste(current_dir,"/data",sep="")
+output_dir<-paste(current_dir,"/output_dir",sep="")
+
+setwd(input_dir)
 
 tab_hmm<-read.delim(file="HMM_results_nstates_3.txt",stringsAsFactors=F)
 list_tissue<-paste("TCGA-",unique(sapply(strsplit(tab_hmm[,1],split="\\."),"[[",1)),sep="")
@@ -14,8 +21,6 @@ tab_hmm[,1]<-unlist(lapply(strsplit(tab_hmm[,1],split="\\."),FUN=function(x){pas
 #
 # Get end-points
 #
-
-setwd("/home/guidantoniomt/pseudospace/survival_analysis")
 
 my_data <- read_excel("1-s2.0-S0092867418302290-mmc1.xlsx",sheet="TCGA-CDR")
 my_data2 <- my_data[,-1]
@@ -67,8 +72,6 @@ TCGA_global_tcga2[grep(TCGA_global_tcga2$tumor_stage,pattern="^stage x$",value=F
 TCGA_global_tcga2<-TCGA_global_tcga2[-which(TCGA_global_tcga2$tumor_stage%in%"not_reported"),]
 TCGA_global_tcga2$tumor_stage<-ifelse(TCGA_global_tcga2$tumor_stage=="High",1,0)
 
-setwd("/home/guidantoniomt/pseudospace/ml_for_ppt/cosmic_focal_broad_variants")
-
 list_rdata_lasso<-c("HMM_nstates3_mock.mes.vs.epi.tissue.TRUE.1000.cosmic_arms_focal.RData","HMM_nstates3_mock.mes.vs.mix.tissue.TRUE.1000.cosmic_arms_focal.RData","HMM_nstates3_mock.mix.vs.epi.tissue.TRUE.1000.cosmic_arms_focal.RData")
 
 list_class1<-c("mes","mes","mix")
@@ -100,23 +103,22 @@ for(i in 1:length(list_rdata_lasso)){
 
 names(markers_lasso)<-paste(list_class1,list_class2,sep="_vs_")
 
-setwd("/home/guidantoniomt/pseudospace/survival_analysis")
+setwd(input_dir)
+
 ven <- venndetail(list(mes_vs_epi=markers_lasso[["mes_vs_epi"]],
-		       mes_vs_mix=markers_lasso[["mes_vs_mix"]],
-		       mix_vs_epi=markers_lasso[["mix_vs_epi"]]))
+mes_vs_mix=markers_lasso[["mes_vs_mix"]],
+mix_vs_epi=markers_lasso[["mix_vs_epi"]]))
 
 mes_vs_epi_spec<-ven@wide[ven@wide$mes_vs_epi==1 & ven@wide$mix_vs_epi==0,1]
 mes_vs_mix_spec<-ven@wide[ven@wide$mes_vs_epi==0 & ven@wide$mix_vs_epi==0,1]
 mix_vs_epi_spec<-ven@wide[ven@wide$mes_vs_epi==0 & ven@wide$mix_vs_epi==1,1]
 
-setwd("/home/guidantoniomt/pseudospace/ml_for_ppt")
-
 input_ml<-fread("input_for_ml_hmm_states_3_mock_as_gd.txt",data.table=F)
 input_ml[,1]<-unlist(lapply(strsplit(input_ml[,1],split="\\-"),FUN=function(x){paste(x[1:3],collapse="-")}))
 
 list_comparisons<-list(mes_vs_epi=grep(mes_vs_epi_spec,pattern="dndscv",value=T),
-		       mes_vs_mix=grep(mes_vs_mix_spec,pattern="dndscv",value=T),
-		       mix_vs_epi=grep(mix_vs_epi_spec,pattern="dndscv",value=T))
+  mes_vs_mix=grep(mes_vs_mix_spec,pattern="dndscv",value=T),
+  mix_vs_epi=grep(mix_vs_epi_spec,pattern="dndscv",value=T))
 
 getFeatures<-function(list_markers,string){
 
@@ -179,8 +181,8 @@ for(am in 1:length(list_comparisons2)){
   
   statistic_coxph<-data.frame()
   
-  setwd("/home/guidantoniomt/pseudospace/survival_analysis")
-  
+  setwd(output_dir)
+
   for(cl in 1:length(markers2)){
     
     current_marker<-names(markers2)[cl]
@@ -238,7 +240,7 @@ for(am in 1:length(list_comparisons2)){
   
   }
   
-    setwd("/home/guidantoniomt/pseudospace/survival_analysis")
+    setwd(output_dir)
     library(forcats)
     library(ggforce)
     library(wesanderson)
@@ -258,8 +260,6 @@ for(am in 1:length(list_comparisons2)){
       
       print(group)
       
-      #http://www.sthda.com/english/wiki/cox-proportional-hazards-model
-
       stat_group2<-statistic_coxph3[statistic_coxph3$comparison%in%group,]
       stat_group2_bad<-stat_group2[stat_group2$HR_marker > 1.5,]
       

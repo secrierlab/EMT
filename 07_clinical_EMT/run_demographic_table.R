@@ -1,8 +1,12 @@
 library(TCGAbiolinks)
 library(plyr)
 
-setwd("/home/guidantoniomt/pseudospace/HMM")
+setwd('..')
+current_dir<-getwd()
+input_dir<-paste(current_dir,"/data",sep="")
+output_dir<-paste(current_dir,"/output_dir",sep="")
 
+setwd(input_dir)
 tab_hmm<-read.delim(file="HMM_results_nstates_3.txt",stringsAsFactors=F)
 
 list_tissue<-paste("TCGA-",unique(sapply(strsplit(tab_hmm[,1],split="\\."),"[[",1)),sep="")
@@ -49,13 +53,15 @@ df_stage<-data.frame(high_stage=high_stage_cancers,
 
 df_stage<-df_stage[c(2,3,1),]
 
+setwd(output_dir)
+
 write.table(df_stage,file="stages_hmm_collapsed2.txt",sep="\t",quote=F)
 
 
 #chisq.test using epi, mes, mix, and high,low, not reported
 stat_mes_epi_mix_all_stages<-chisq.test(df_stage)
 
-setwd("/home/guidantoniomt/pseudospace/survival_analysis")
+setwd(output_dir)
 
 library(corrplot)
 pdf("chisq_all_groups_and_stages.pdf")
@@ -74,5 +80,5 @@ corrplot(contrib, is.cor = FALSE)
 dev.off()
 
 
-setwd("/home/guidantoniomt/pseudospace/survival_analysis")
+setwd(output_dir)
 write.table(df_stage,file="TCGA_EMT_STATES_clinical_stage.txt",sep="\t",row.names=T,quote=F)

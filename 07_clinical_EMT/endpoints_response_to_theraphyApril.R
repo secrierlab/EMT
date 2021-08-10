@@ -5,8 +5,12 @@ source("ggforest2.R")
 library("readxl")
 library(plyr)
 
-setwd("/home/guidantoniomt/pseudospace/HMM")
+setwd('..')
+current_dir<-getwd()
+input_dir<-paste(current_dir,"/data",sep="")
+output_dir<-paste(current_dir,"/output_dir",sep="")
 
+setwd(input_dir)
 tab_hmm<-read.delim(file="HMM_results_nstates_3.txt",stringsAsFactors=F)
 
 list_tissue<-paste("TCGA-",unique(sapply(strsplit(tab_hmm[,1],split="\\."),"[[",1)),sep="")
@@ -71,7 +75,7 @@ for(tissue in 1:length(list_tissue)){
 
 TCGA_global_drugs<-rbind.fill(TCGA_global_tcga)
 
-setwd("/home/guidantoniomt/pseudospace/survival_analysis")
+setwd(input_dir)
 
 library(readxl)
 library(survival)
@@ -245,6 +249,8 @@ list_comparisons[[3]]<-c("all_mes","epi")
 #
 # Find the significant drugs related with the EMT and response
 #
+
+setwd(output_dir)
 
 drugs<-NULL
 pvalue<-NULL

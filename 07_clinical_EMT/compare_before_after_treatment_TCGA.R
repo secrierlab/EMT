@@ -8,6 +8,14 @@ library(grid)
 library(cowplot)
 library(ggplot2)
 
+
+folder_analysis<-getwd()
+
+setwd('..')
+current_dir<-getwd()
+input_dir<-paste(current_dir,"/data",sep="")
+output_dir<-paste(current_dir,"/output_dir",sep="")
+
 prepareCombat<-function(dat,batch){        
   
   dat <- as.matrix(dat)
@@ -37,7 +45,7 @@ prepareCombat<-function(dat,batch){
 # Load canonical marker genes for EMT
 #
 
-setwd("/home/guidantoniomt/pseudospace/HMM")
+setwd(input_dir)
 markers_genes_read<-read.table(file="EMT_and_pEMT_markers.txt",header=T)
 
 # 
@@ -45,7 +53,7 @@ markers_genes_read<-read.table(file="EMT_and_pEMT_markers.txt",header=T)
 #
 
 
-knn_df_tcga<-read.delim(file="/home/guidantoniomt/pseudospace/HMM/HMM_results_nstates_tumors_for_states3.withEMT.txt",stringsAsFactors=F)
+knn_df_tcga<-read.delim(file="HMM_results_nstates_tumors_for_states3.withEMT.txt",stringsAsFactors=F)
 knn_df_tcga$samples2<-knn_df_tcga$samples
 knn_df_tcga$samples<- unlist(lapply(strsplit(as.character(knn_df_tcga$samples),split="\\."),FUN=function(X){paste(X[2:5],collapse="-")}))
 
@@ -54,7 +62,7 @@ knn_df_tcga$samples<- unlist(lapply(strsplit(as.character(knn_df_tcga$samples),s
 # Load the TCGA dataset
 # 
 
-setwd("/home/guidantoniomt/pseudospace/input_pseudospace")
+setwd(input_dir)
 load("TCGA_matrix_gene_expression_signals_ALLGENES_29_01_2020.RData")
 
 tcga<-TCGA_GEXP_ALL
@@ -67,7 +75,7 @@ rownames(tcga2)<-tcga2[,1]
 columns_to_use<-c("gene_symbol",knn_df_tcga$samples2)
 tcga3<-tcga2[,which(colnames(tcga2)%in%columns_to_use)]
 
-therapy_table_tcga<-fread("/home/guidantoniomt/pseudospace/survival_analysis/media-2.tsv",data.table=F)
+therapy_table_tcga<-fread("media-2.tsv",data.table=F)
 therapy_table_tcga$patient_barcode<-toupper(therapy_table_tcga$patient_barcode)
 
 therapy_table_tcga_uni<-unique(therapy_table_tcga[,c("patient_barcode","drug_name")])
@@ -75,12 +83,12 @@ therapy_table_tcga_uni<-unique(therapy_table_tcga[,c("patient_barcode","drug_nam
 # 
 # Load the POG dataset
 # 
-dem_table <- read.xlsx(xlsxFile = "/home/guidantoniomt/pseudospace/POG570/Table_S1_Demographics.xlsx", sheet = 1)
+dem_table <- read.xlsx(xlsxFile = "/Table_S1_Demographics.xlsx", sheet = 1)
 samples_to_remove<-dem_table[which(dem_table$PRIMARY_SITE%in%c("Blood","Brain")),1]
 
-therapy_table<-read.xlsx(xlsxFile = "/home/guidantoniomt/pseudospace/POG570/Table_S2_Treatment.xlsx", sheet = 1)
+therapy_table<-read.xlsx(xlsxFile = "Table_S2_Treatment.xlsx", sheet = 1)
 
-setwd("/home/guidantoniomt/pseudospace/POG570")
+setwd(input_dir)
 tab_exp<-fread("POG570_TPM_expression.txt.gz",header=T)
 
 mart <- useMart(biomart = "ensembl", dataset = "hsapiens_gene_ensembl")
@@ -155,7 +163,7 @@ dfEMT_tcga_hmm$hmm_states<-gsub(dfEMT_tcga_hmm$hmm_states,pattern="3",replacemen
 dfEMT_tcga_hmm$ID<- unlist(lapply(strsplit(as.character(dfEMT_tcga_hmm$ID),split="\\."),FUN=function(X){paste(X[2:4],collapse="-")}))
 
 #merge with the HMM states in POG
-load("/home/guidantoniomt/pseudospace/POG570/Pseudotime_POG_on_MCF.RData")
+load("Pseudotime_POG_on_MCF.RData")
 dfEMTscores[,1]<-gsub(dfEMTscores[,1],pattern="^X",replacement="")
              
 dfEMT_pog_hmm<-merge(dfEMTscores[grep(dfEMTscores[,1],pattern="TCGA",invert=T),],POG_pseudotime_EMT_metpot_HMM[,c(1,4)],by.x="ID",by.y="POG_ID")
@@ -169,7 +177,7 @@ dfEMT_global<-rbind(dfEMT_tcga_hmm,dfEMT_pog_hmm)
 
 dfEMT_global$status<-factor(dfEMT_global$status,levels=c("before_treatment","after_treatment"))
 
-setwd("/home/guidantoniomt/pseudospace/POG570/")
+setwd(output_dir)
 
 pdf("boxplot_EMT_score_TCGA_POG_before_after_treatment.pdf")
 p2_sig<-ggplot(dfEMT_global,aes(x=status, y=EMT_score))+
@@ -248,8 +256,8 @@ list_drugs<-stat.test[stat.test$p<=0.05,1]
 for(pqd in list_drugs){
   
   p2_sig<-ggplot(dfEMT_global_drugs[dfEMT_global_drugs$drugs%in%pqd,],aes(x=status, y=EMT_score))+
-    geom_boxplot()+geom_jitter(width=0.1, aes(color = EMT_score))+scale_colour_gradient2(low = "orange2", mid = "grey", high = "darkmagenta", midpoint = 0)+
-    theme(text = element_text(size=8),legend.position="top")+theme_bw()+ ylab("EMT score")
+  geom_boxplot()+geom_jitter(width=0.1, aes(color = EMT_score))+scale_colour_gradient2(low = "orange2", mid = "grey", high = "darkmagenta", midpoint = 0)+
+  theme(text = element_text(size=8),legend.position="top")+theme_bw()+ ylab("EMT score")
   
   p3<-p2_sig+stat_compare_means(comparisons = list(c("before_treatment","after_treatment")),method="wilcox.test")
   p3<-p3+ geom_hline(yintercept=0, linetype="dashed", color = "red")+ggtitle(pqd)
@@ -282,8 +290,8 @@ list_drugs<-stat.test[stat.test$p<=0.05,1]
 for(pqd in list_drugs){
   
   p2_sig<-ggplot(dfEMT_global_drugs_transformed[dfEMT_global_drugs_transformed$drugs%in%pqd,],aes(x=status, y=EMT_score))+
-    geom_boxplot()+geom_jitter(width=0.1, aes(color = EMT_score))+scale_colour_gradient2(low = "orange2", mid = "grey", high = "darkmagenta", midpoint = 0)+
-    theme(text = element_text(size=8),legend.position="top")+theme_bw()+ ylab("EMT score")
+  geom_boxplot()+geom_jitter(width=0.1, aes(color = EMT_score))+scale_colour_gradient2(low = "orange2", mid = "grey", high = "darkmagenta", midpoint = 0)+
+  theme(text = element_text(size=8),legend.position="top")+theme_bw()+ ylab("EMT score")
   
   p3<-p2_sig+stat_compare_means(comparisons = list(c("before_treatment","after_treatment")),method="wilcox.test")
   p3<-p3+ geom_hline(yintercept=0, linetype="dashed", color = "red")+ggtitle(pqd)
@@ -352,15 +360,15 @@ for(pqd2 in list_drugs2){
   pval_for_main<-df_drugs2[df_drugs2[,1]%in%pqd2,2]
   
   stat.test <- dfEMT_global_drugs %>%
-    group_by(hmm_states) %>%
-    t_test(EMT_score ~ status)
+  group_by(hmm_states) %>%
+  t_test(EMT_score ~ status)
 
   stat.test <- stat.test %>% 
-    add_xy_position(x = "hmm_states", dodge = 0.8)
+  add_xy_position(x = "hmm_states", dodge = 0.8)
   
   p2_sig_drug<-ggplot(dfEMT_global_drugs[dfEMT_global_drugs$drugs%in%pqd2,],aes(x=hmm_states, y=EMT_score,color=status))+
-    geom_boxplot()+ stat_pvalue_manual(stat.test,  label = "p", tip.length = 0)+
-    theme(text = element_text(size=8),legend.position="top")+theme_bw()+ ylab("EMT score")
+  geom_boxplot()+ stat_pvalue_manual(stat.test,  label = "p", tip.length = 0)+
+  theme(text = element_text(size=8),legend.position="top")+theme_bw()+ ylab("EMT score")
   
   p3_drug<-p2_sig_drug+stat_compare_means(comparisons = list(c("before_treatment","after_treatment")),method="wilcox.test")
   p4_drug<-p3_drug+ geom_hline(yintercept=0, linetype="dashed", color = "red")+ggtitle(paste(pqd2,":",pval_for_main))

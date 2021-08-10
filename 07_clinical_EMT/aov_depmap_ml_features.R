@@ -5,12 +5,17 @@
 library(depmap)
 library(data.table)
 
-setwd("/home/guidantoniomt/pseudospace/CCLE")
+folder_analysis<-getwd()
+
+setwd('..')
+current_dir<-getwd()
+input_dir<-paste(current_dir,"/data",sep="")
+output_dir<-paste(current_dir,"/output_dir",sep="")
+
+setwd(input_dir)
+
 load("CCLE_pseudotime_MCF.RData")
 
-CCLE_pseudotime_EMT_HMM
-
-setwd("/home/guidantoniomt/pseudospace/depmap")
 annotation_drug<-read.csv(file="primary-screen-replicate-collapsed-treatment-info.csv",stringsAsFactors = F)
 annotation_cellline<-read.csv(file="primary-screen-cell-line-info.csv",stringsAsFactors = F)
 
@@ -24,12 +29,9 @@ CCLE_with_drugs2<-CCLE_with_drugs[,c(9,12:ncol(CCLE_with_drugs))]
 
 ccle_mutation<-fread(file="CCLE_mutations.csv")
   
-merge(ccle_mutation,)
 #
 # Now integrate the genomic features
 #
-
-setwd("/home/guidantoniomt/pseudospace/ml_for_ppt/cosmic_focal_broad_variants")
 
 getFeaturesSS<-function(res_lasso,ss=800){
   
@@ -61,8 +63,6 @@ getCoefSS<-function(res_lasso,features_to_select){
   
 }
 
-setwd("/home/guidantoniomt/pseudospace/ml_for_ppt/cosmic_focal_broad_variants")
-
 load("HMM_nstates3_mock.mes.vs.epi.tissue.TRUE.1000.cosmic_arms_focal.RData")
 
 markers_mes_vs_epi<-getFeaturesSS(res_lasso,ss=800)
@@ -75,7 +75,7 @@ markers_pemt_vs_epi<-getFeaturesSS(res_lasso,ss=800)
 mut_genes_pemt_vs_epi_raw<-grep(markers_pemt_vs_epi,pattern="dndscv",value=T)
 mut_genes_pemt_vs_epi<-sapply(strsplit(grep(markers_pemt_vs_epi,pattern="dndscv",value=T),split="_"),"[[",1)
 
-setwd("/home/guidantoniomt/pseudospace/depmap")
+setwd(output_dir)
 
 list_analysis<-vector(mode="list",2)
 list_analysis[[1]]<-setdiff(mut_genes_mes_vs_epi,mut_genes_pemt_vs_epi)
