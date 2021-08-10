@@ -21,12 +21,14 @@ All the analysis have been run on a server with 64 CPU (Intel(R) Xeon(R) Gold 52
 
 Here the procedure:
 
+- Open RStudio or a R-shell.
+
 ```r
-# Move in the directory in which there is a script
+# Move in the directory in which there is the installation file
 setwd("/Users/username/Desktop/EMT-main")
 
 # run the script
-source("install.R")
+source("INSTALL.R")
 ```
 On a normal laptop/desktop computer (2.4 GHz Quad-Core Intel Core i5, 8 GB 2133 MHz LPDDR3), the installation could take 20-30 minutes.
 
@@ -44,7 +46,7 @@ foo@bar:~$ sh download_data.sh
 ## How to run a script
 
 1) Check that all the depencies are installed (INSTALL.R script)
-2) Open RStudio or shell
+2) Open RStudio or a R-shell
 3) Move in the path with the script of interest as follow. 
 
 For example if the user wants to run the segmentation (run_hmm.R) on a toy dataset of gene-expression (TCGA) these are the steps to use:
