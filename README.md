@@ -25,7 +25,7 @@ The references of the datasets used in this work are reported in the section "Re
 
 Steps:
 
-1) run the scripts inside the /data folder as follow:
+1) run the bash scripts inside the /data folder as follow:
 ```console
 foo@bar:~$ sh decompress_data.sh
 foo@bar:~$ sh download_data.sh
