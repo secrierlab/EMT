@@ -33,6 +33,8 @@ markers_genes<-markers_genes_read[,1]
 
 TCGA_GEXP_ALL_rid<-TCGA_GEXP_ALL[TCGA_GEXP_ALL[,1]%in%markers_genes,]
 
+pseudospace_input_sort<-pseudospace_input_sort[which(pseudospace_input_sort$patients2%in%colnames(TCGA_GEXP_ALL_rid)),]
+
 TCGA_GEXP_ALL_sort<-log(t(TCGA_GEXP_ALL_rid[,match(pseudospace_input_sort$patients2,colnames(TCGA_GEXP_ALL_rid))])+1,2)
 colnames(TCGA_GEXP_ALL_sort)<-TCGA_GEXP_ALL[TCGA_GEXP_ALL[,1]%in%markers_genes,1]
 
@@ -182,8 +184,10 @@ resHMM_for_heatmap<-cbind(samples=rownames(TCGA_GEXP_ALL_sort),HMMpost)
 	row_colors=list(type=c("Mesenchymal_marker"="firebrick4","Epithelial_marker"="dodgerblue3","pEMT"="orange2"))
 
 	input_cp_scale2<-pseudospace_input[order(pseudospace_input$mock,decreasing=F),]
-
-	ann_samples<-input_cp_scale2[,c(3,11)]
+  
+	samples_to_use<-sapply(strsplit(colnames(TCGA_GEXP_ALL_sort2),split="\\."),"[[",4)
+  
+	ann_samples<-input_cp_scale2[input_cp_scale2[,1]%in%samples_to_use,c(3,11)]
 	ann_samples[,1]<-as.character(ann_samples[,1])
 	ann_samples[,2]<-as.character(ann_samples[,2])
 	colnames(ann_samples)[1:2]<-c("tumors","tumor_stage")
