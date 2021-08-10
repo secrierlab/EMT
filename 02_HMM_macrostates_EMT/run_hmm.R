@@ -5,23 +5,29 @@ library(FNN)
 library(TSCAN)
 library(igraph)
 library(slingshot)
-#library(SingleCellExperiment)
 library(RColorBrewer)
 library(depmixS4)
 library(pheatmap)
 library(ComplexHeatmap)
 
-setwd("/data/pseudospace/input_pseudospace")
+folder_analysis<-getwd()
+
+setwd('..')
+current_dir<-getwd()
+input_dir<-paste(current_dir,"/data",sep="")
+output_dir<-paste(current_dir,"/output_dir",sep="")
+
+setwd(input_dir)
 load("TCGA_matrix_gene_expression_signals_ALLGENES_29_01_2020.RData")
 
 input_file<-c("proj_pseudospace_mcf_mock_mock_Mclust3_with_pemt.txt")
 
-setwd("/data/pseudospace")
+setwd(input_dir)
 pseudospace_input<-read.delim(file="proj_pseudospace_mcf_tgfb_mock_Mclust3_with_pemt.txt")
 
 pseudospace_input_sort<-pseudospace_input[order(pseudospace_input$mock,decreasing=F),]
 
-setwd("/data/pseudospace/HMM")
+setwd(input_dir)
 markers_genes_read<-read.table(file="EMT_and_pEMT_markers.txt",header=T)
 markers_genes<-markers_genes_read[,1]
 
@@ -33,6 +39,8 @@ colnames(TCGA_GEXP_ALL_sort)<-TCGA_GEXP_ALL[TCGA_GEXP_ALL[,1]%in%markers_genes,1
 #TCGA_GEXP_ALL_sort<-log(TCGA_GEXP_ALL_sort+1,2)
 #zscore<-function(x){(x-mean(x))/sd(x)}
 #TCGA_GEXP_ALL_sort<-apply(TCGA_GEXP_ALL_sort,1,zscore)
+
+setwd(output_dir)
 
 set.seed(12345)
 
@@ -73,23 +81,9 @@ HMMfit<-fit(HMM, verbose = FALSE) #fit our model to the data set
 
 idx_trans<-which(names(getpars(HMMfit))=="")
 
-#https://stackoverflow.com/questions/50327876/obtain-transition-matrix-in-r-depmixs4-package
-
 transition_matrix<-matrix(getpars(HMMfit)[idx_trans],byrow=T,nrow=nstates)
 rownames(transition_matrix)<-paste("from",1:nstates,sep="")
 colnames(transition_matrix)<-paste("to",1:nstates,sep="")
-
-#OR:https://warwick.ac.uk/fac/sci/statistics/staff/academic-research/huang/r-code.pdf
-#https://www.audiolabs-erlangen.de/resources/MIR/FMP/C5/C5S3_HiddenMarkovModel.html
-
-#A<-getpars(HMMfit)
-
-#tmat<-matrix(NA,nrow=3,ncol=3) 
-#for (i in 1:3){
-#start<-3*i+1
-#tmat[i,]<-A[start:(start+3-1)] 
-#}
-
 
 gp <- graph.adjacency(transition_matrix, mode = "directed", weighted = TRUE)
 dp_mst <- minimum.spanning.tree(gp)

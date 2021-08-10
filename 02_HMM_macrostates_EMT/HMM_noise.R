@@ -7,17 +7,21 @@ library(caret)
 library(reshape2)
 library(mltest)
 
-setwd("/home/pseudospace")
+folder_analysis<-getwd()
+
+setwd('..')
+current_dir<-getwd()
+input_dir<-paste(current_dir,"/data",sep="")
+output_dir<-paste(current_dir,"/output_dir",sep="")
+
 load("TCGA_matrix_gene_expression_signals_ALLGENES_29_01_2020.RData")
 
-input_file<-c("proj_pseudospace_mcf_mock_mock_Mclust3_with_pemt.txt")
-
-setwd("/home/pseudospace")
+setwd(input_dir)
 pseudospace_input<-read.delim(file="proj_pseudospace_mcf_tgfb_mock_Mclust3_with_pemt.txt")
 
 pseudospace_input_sort<-pseudospace_input[order(pseudospace_input$mock,decreasing=F),]
 
-setwd("/home/pseudospace")
+setwd(input_dir)
 markers_genes_read<-read.table(file="EMT_and_pEMT_markers.txt",header=T)
 markers_genes<-markers_genes_read[,1]
 
@@ -30,7 +34,6 @@ colnames(TCGA_GEXP_ALL_sort)<-TCGA_GEXP_ALL[TCGA_GEXP_ALL[,1]%in%markers_genes,1
 # Original HMM
 #
 
-setwd("/home/pseudospace")
 input_file<-c("HMM_results_nstates_3.txt")
 knn_df_tcga<-read.delim(file=input_file)
 knn_df_tcga<-knn_df_tcga[,which(colnames(knn_df_tcga)%in%c("samples","biological_states"))]
@@ -173,6 +176,8 @@ for(i in 1:100){
     all_delta_noise<-rbind(all_delta_noise,all_delta)
     all_tissues_noise<-rbind(all_tissues_noise,all_tissue)
 }
+
+setwd(output_dir)
 
 save(list=c("all_res_noise","all_accuracy_noise","all_delta_noise","all_tissues_noise"),file="HMM_noise.RData")
 
