@@ -1,4 +1,11 @@
-setwd("/home/data/pseudospace/tcga_nocorrect_primary_tumors/23_04_2020_threegroups")
+folder_analysis<-getwd()
+
+setwd('..')
+current_dir<-getwd()
+input_dir<-paste(current_dir,"/data",sep="")
+output_dir<-paste(current_dir,"/output_dir",sep="")
+
+setwd(input_dir)
 
 markers_genes<-read.delim(file="EMT_and_pEMT_markers.txt",header=T)
 
