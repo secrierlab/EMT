@@ -182,12 +182,10 @@ resHMM_for_heatmap<-cbind(samples=rownames(TCGA_GEXP_ALL_sort),HMMpost)
 
 
 	row_colors=list(type=c("Mesenchymal_marker"="firebrick4","Epithelial_marker"="dodgerblue3","pEMT"="orange2"))
-
+  
 	input_cp_scale2<-pseudospace_input[order(pseudospace_input$mock,decreasing=F),]
   
-	samples_to_use<-sapply(strsplit(colnames(TCGA_GEXP_ALL_sort2),split="\\."),"[[",4)
-  
-	ann_samples<-input_cp_scale2[input_cp_scale2[,1]%in%samples_to_use,c(3,11)]
+	ann_samples<-input_cp_scale2[input_cp_scale2$patients2%in%colnames(TCGA_GEXP_ALL_sort2),c(3,11)]
 	ann_samples[,1]<-as.character(ann_samples[,1])
 	ann_samples[,2]<-as.character(ann_samples[,2])
 	colnames(ann_samples)[1:2]<-c("tumors","tumor_stage")
@@ -237,16 +235,16 @@ resHMM_for_heatmap<-cbind(samples=rownames(TCGA_GEXP_ALL_sort),HMMpost)
 				   tumors=ann_samples[,1],
 				   stage=ann_samples[,2],
 				   col=list(emt_score=col_fun,
-					     tumors=annotation_colors[[1]],
-					     stage=annotation_colors[[2]]))
+           tumors=annotation_colors[[1]],
+           stage=annotation_colors[[2]]))
 
 	library(ComplexHeatmap)
 	library(forcats)
 
 	pdf(paste("HMM_heatmap_mock",nstates,"pdf",sep="."),width=12)
 	p<-Heatmap(TCGA_GEXP_ALL_sort2,
-        	column_split=as.factor(HMMpost$state),
-        	show_column_names=F,
+    column_split=as.factor(HMMpost$state),
+    show_column_names=F,
 		left_annotation = row_ann,
 		top_annotation = col_ann,
 		row_km=3)
@@ -296,13 +294,13 @@ resHMM_for_heatmap<-cbind(samples=rownames(TCGA_GEXP_ALL_sort),HMMpost)
 
 	for(mark_emt in 1:length(list_mark_emt)){
 	
-		exp_current_mark<-TCGA_GEXP_ALL_sort[,mark_emt]
+  exp_current_mark<-TCGA_GEXP_ALL_sort[,mark_emt]
 
-		df_exp_current_mark<-data.frame(samples=names(exp_current_mark),genes=list_mark_emt[mark_emt],exp=exp_current_mark)
+  df_exp_current_mark<-data.frame(samples=names(exp_current_mark),genes=list_mark_emt[mark_emt],exp=exp_current_mark)
 
-		df_exp_current_mark_pseudo<-merge(pseudospace_with_score,df_exp_current_mark,by.x="patients2",by.y="samples")
+  df_exp_current_mark_pseudo<-merge(pseudospace_with_score,df_exp_current_mark,by.x="patients2",by.y="samples")
 	
-		all_markers<-rbind(all_markers,df_exp_current_mark_pseudo)
+  all_markers<-rbind(all_markers,df_exp_current_mark_pseudo)
 
 	}
 
@@ -311,57 +309,16 @@ resHMM_for_heatmap<-cbind(samples=rownames(TCGA_GEXP_ALL_sort),HMMpost)
 	
 	df_exp_current_mark_pseudo_selected<-all_markers[all_markers$genes%in%c("CDH1","CRB3","DSP","CDH2","FN1","VIM"),]
 	df_exp_current_mark_pseudo_selected$genes<-as.character(df_exp_current_mark_pseudo_selected$genes)
-        df_exp_current_mark_pseudo_selected$genes<-factor(df_exp_current_mark_pseudo_selected$genes,levels=c("CDH1","CRB3","DSP","CDH2","FN1","VIM"))
+  df_exp_current_mark_pseudo_selected$genes<-factor(df_exp_current_mark_pseudo_selected$genes,levels=c("CDH1","CRB3","DSP","CDH2","FN1","VIM"))
 
 
-        p<-ggplot(df_exp_current_mark_pseudo_selected, 
-		  aes(x=mock, y=exp,color=states))+geom_point(shape=17,size=2)+ylim(0,max(TCGA_GEXP_ALL_sort))+facet_wrap(.~genes,nrow=3,ncol=3)+scale_x_reverse()+ scale_color_manual(values=c('#e69f00','#56b4e9','#ee0c0c'))+geom_smooth(aes(group=states,linetype=states),method = "lm", formula = y ~ poly(x,4),se=TRUE,color="black")+ scale_linetype_manual(values=c("twodash","dotted","solid"))+theme_classic()
+  p<-ggplot(df_exp_current_mark_pseudo_selected, 
+  aes(x=mock, y=exp,color=states))+geom_point(shape=17,size=2)+ylim(0,max(TCGA_GEXP_ALL_sort))+facet_wrap(.~genes,nrow=3,ncol=3)+scale_x_reverse()+ scale_color_manual(values=c('#e69f00','#56b4e9','#ee0c0c'))+geom_smooth(aes(group=states,linetype=states),method = "lm", formula = y ~ poly(x,4),se=TRUE,color="black")+ scale_linetype_manual(values=c("twodash","dotted","solid"))+theme_classic()
 	print(p)	
 	
 	dev.off()
 
-	#
-	# Plot only LUAD, BRCA, PRAD, OVCA
-	#
-	
-	ann_hmm_emt<-cbind(scores_EMT,state=HMMpost$state,ann_samples)
 
-	list_tum_to_plot<-c("LUAD","BRCA","PRAD","OV")
-
-	for(ltp in list_tum_to_plot){
-
-	print(ltp)
-
-	       	ann_samples_tum<-ann_hmm_emt[ann_hmm_emt$tumors %in% ltp,]
-
-		TCGA_GEXP_ALL_sort2_tum<-TCGA_GEXP_ALL_sort2[,colnames(TCGA_GEXP_ALL_sort2)%in%ann_samples_tum[,1]]
-
-                ann_samples_tum<-ann_samples_tum[match(colnames(TCGA_GEXP_ALL_sort2_tum),ann_samples_tum[,1]),]
-
-		all_scores_emt2<-ann_samples_tum$score_emt
-		
-		col_fun = colorRamp2(c(min(all_scores_emt), 0, max(all_scores_emt)), c("deepskyblue3", "gainsboro", "darkorange2"))
-
-        	col_ann2<-HeatmapAnnotation(emt_score=all_scores_emt2,
-                                   tumors=ann_samples_tum[,"tumors"],
-                                   stage=ann_samples_tum[,"tumor_stage"],
-                                   col=list(emt_score=col_fun,
-                                             tumors=annotation_colors[[1]],
-                                             stage=annotation_colors[[2]]))
-	        library(ComplexHeatmap)
-
-	        pdf(paste("HMM_heatmap_mock",nstates,ltp,"pdf",sep="."),width=12)
-        	p<-Heatmap(TCGA_GEXP_ALL_sort2_tum,
-                	column_split=as.factor(ann_samples_tum$state),
-                	show_column_names=F,
-               		left_annotation = row_ann,
-                	top_annotation = col_ann2,
-                	row_km=3)
-        	print(p)
-        	dev.off()
-	
-
-	}
 
 
 }
