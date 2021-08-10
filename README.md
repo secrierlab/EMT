@@ -90,6 +90,7 @@ This folder contains the code to perform the validation using external datasets.
 - **validation_Schaller_CNV.R:** This script check if putative biomarkers of EMT associated with CNV are targets of TFs important for EMT
 
 # How to cite
+At present, a version of this manuscript is available on bioarXiv: https://www.biorxiv.org/content/10.1101/2021.07.23.453584v1.
 
 # Reference datasets
 
