@@ -3,7 +3,14 @@
 #
 require(sjPlot)
 
-setwd('/data/pseudospace/HMM')
+folder_analysis<-getwd()
+
+setwd('..')
+current_dir<-getwd()
+input_dir<-paste(current_dir,"/data",sep="")
+output_dir<-paste(current_dir,"/output_dir",sep="")
+
+setwd(input_dir)
 input_file<-c("HMM_results_nstates_3.txt")
 knn_df_tcga<-read.delim(file=input_file)
 
@@ -19,8 +26,6 @@ table(code_for_met,tum_for_met)
 #
 # Read mutational signatures data SigProfiler
 #
-
-setwd("/data/pseudospace/mutational_signature/sbs_solutions_deconstructSigs_Sigprofiler")
 
 sampleinfo<-c("sigs.defaultnounknown.ACC.RData", "sigs.defaultnounknown.BLCA.RData","sigs.defaultnounknown.BRCA.metastatic.RData",
              "sigs.defaultnounknown.CESC.metastatic.RData","sigs.defaultnounknown.CHOL.RData","sigs.defaultnounknown.COAD.metastatic.RData",
@@ -62,7 +67,7 @@ sigs_ballon<-melt(store_matrices)[,-1]
 colnames(sigs_ballon)[ncol(sigs_ballon)]<-"tum"
 sigs_ballon$tum<-as.factor(sigs_ballon$tum)
 
-setwd("/data/pseudospace/mutational_signature/")
+setwd(output_dir)
 
 avg_contribution<-aggregate(.~tum+variable, sigs_ballon, mean)
 
@@ -178,213 +183,8 @@ library(caret)
 # Get only the columns in which the sum is greater than 0 (signals of mutational signatures)
 #
 
-# columns_to_save<-c("score_emt","tumors","states",names(which(apply(mutsig_with_pseudotime2[,10:ncol(mutsig_with_pseudotime2)],2,sum) > 0)))
-# mutsig_with_pseudotime3<-mutsig_with_pseudotime2[,colnames(mutsig_with_pseudotime2)%in%columns_to_save]
-# 
-# mutsig_with_pseudotime3$states<-gsub(mutsig_with_pseudotime3$states,pattern="1",replacement="pEMT")
-# mutsig_with_pseudotime3$states<-gsub(mutsig_with_pseudotime3$states,pattern="2",replacement="epi")
-# mutsig_with_pseudotime3$states<-gsub(mutsig_with_pseudotime3$states,pattern="3",replacement="mes")
-# 
-# form_lm<-as.formula(paste(paste("score_emt","~",paste(grep(colnames(mutsig_with_pseudotime3),pattern="SBS",value=T),collapse="+")),"+tumors"))
-# 
 
-# input_for_boxplot<-mutsig_with_pseudotime2[,c(1,5,6,7,c(10:ncol(mutsig_with_pseudotime2)))]
-# sigs_to_use<-names(which(apply(input_for_boxplot[,-c(1:4)],2,sum)>0))
-# 
-# col_to_use<-c(colnames(input_for_boxplot)[1:4],sigs_to_use)
-# 
-# input_for_boxplot<-input_for_boxplot[,colnames(input_for_boxplot) %in%col_to_use]
-# 
-# input_for_boxplot2<-data.frame()
-# 
-# for(sbs in 5:ncol(input_for_boxplot)){
-# 
-#         sbs_part<-input_for_boxplot[,c(1,2,3,4,sbs)]
-#         sbs_part<-sbs_part[sbs_part[,5]>0.05,]
-#         res<-data.frame(sbs=colnames(input_for_boxplot)[sbs],sbs_part)
-#         colnames(res)[6]<-"sbs_freq"
-# 
-#         input_for_boxplot2<-rbind(input_for_boxplot2,res)
-# }
-# 
-# set.seed(123)
-# 
-# training.samples <- mutsig_with_pseudotime3$score_emt %>% createDataPartition(p = 0.7, list = FALSE)
-# 
-# train.data  <- mutsig_with_pseudotime3[training.samples, ]
-# test.data <- mutsig_with_pseudotime3[-training.samples, ]
-# 
-# res_lm2<-lm(form_lm,train.data,na.omit=T)
-# 
-# res_sm<-summary(res_lm2)$coefficients[,4]
-# update_sigs<-grep(names(res_sm[res_sm<=0.05]),pattern="SBS",value=T)
-# 
-# require(ggplot2)
-
-setwd("/data/pseudospace/mutational_signature")
-# 
-# pdf("coefficients_mutsigs_with_pseudotime_tissuecorrect.pdf")
-# p1<-plot_summs(res_lm2, scale = TRUE, inner_ci_level = .9,coefs=update_sigs)
-# print(p1)
-# p2<-plot_model(res_lm2, vline.color = "red",transform = NULL,show.p = T,show.values = TRUE,terms=update_sigs)
-# print(p2)
-# 
-# 
-# input_for_boxplot3<-input_for_boxplot2[input_for_boxplot2$sbs%in%update_sigs,]
-# 
-# p3<-ggplot(input_for_boxplot3, aes(x = sbs_freq)) +
-#   stat_ecdf(aes(color = biological_states,linetype = biological_states),
-#               geom = "step", size = 0.5) +
-#   scale_color_manual(values = c("#56b4e9","#EE0C0C","#E69f00"))+
-#   labs(y = "f(contr. mut.sig.)")+facet_wrap(.~sbs)+theme_bw()
-# 
-# print(p3)
-# dev.off()
-# 
-# form_lm<-as.formula(paste(paste("score_emt","~",paste(grep(colnames(mutsig_with_pseudotime3),pattern="SBS",value=T),collapse="+"))))
-# 
-# set.seed(123)
-# 
-# res_lm2_notissue<-lm(form_lm,train.data,na.omit=T)
-# 
-# res_sm<-summary(res_lm2_notissue)$coefficients[,4]
-# update_sigs<-grep(names(res_sm[res_sm<=0.05]),pattern="SBS",value=T)
-# 
-# pdf("coefficients_mutsigs_with_pseudotime_notissuecorrect.pdf")
-# p1<-plot_summs(res_lm2, scale = TRUE, inner_ci_level = .9,coefs=update_sigs)
-# print(p1)
-# p2<-plot_model(res_lm2, vline.color = "red",transform = NULL,show.p = T,show.values = TRUE,terms=update_sigs)
-# print(p2)
-# input_for_boxplot3<-input_for_boxplot2[input_for_boxplot2$sbs%in%update_sigs,]
-# p3<-ggplot(input_for_boxplot3, aes(x = sbs_freq)) +
-#   stat_ecdf(aes(color = biological_states,linetype = biological_states),
-#               geom = "step", size = 0.5) +
-#   scale_color_manual(values =  c("#56b4e9","#EE0C0C","#E69f00"))+
-#   labs(y = "f(contr. mut.sig.)")+facet_wrap(.~sbs)+theme_bw()
-# 
-# print(p3)
-# dev.off()
-
-
-# #
-# # glm EPI-MES
-# #
-# 
-# set.seed(123)
-# 
-# mat_temp<-mutsig_with_pseudotime3[,-2]
-# mat_temp<-mat_temp[mat_temp$states%in%c("mes","epi"),]
-# mat_temp$states<-as.factor(ifelse(mat_temp$states=="mes",1,0))
-# mat_temp$tumors<-as.factor(mat_temp$tumors)
-#   
-# training.samples <- mat_temp$states %>% createDataPartition(p = 0.7, list = FALSE)
-# 
-# train.data  <- mat_temp[training.samples, ]
-# test.data <- mat_temp[-training.samples, ]
-# 
-# # tissue effect
-# form_glm<-as.formula(paste(paste("states","~",paste(grep(colnames(train.data),pattern="SBS",value=T),collapse="+")),"+tumors"))
-# 
-# model_mes_epi<-glm(form_glm,train.data,family = "binomial")
-# step.model <- model_mes_epi %>% stepAIC(trace = TRUE)
-# 
-# update_sigs<-grep(names(which(summary(step.model)$coefficients[,4]<=0.05)),pattern="SBS",value=T)
-# 
-# update_sigs<-grep(names(summary(step.model)$coefficients[,4]),pattern="SBS",value=T)
-# 
-# form_glm<-as.formula(paste(paste("states","~",paste(update_sigs,collapse="+")),"+tumors"))
-# 
-# model_mes_epi<-glm(form_glm,train.data,family = "binomial")
-# 
-# require(sjPlot)
-# 
-# pdf("glm_sbs_mes_epi.pdf")
-# p1<-plot_summs(step.model, scale = TRUE, inner_ci_level = .9,coefs=update_sigs)
-# print(p1)
-# p2<-plot_model(model_mes_epi, vline.color = "red",transform = NULL,show.p = T,show.values = TRUE,terms=update_sigs)
-# print(p2)
-# dev.off()
-# 
-# # no tissue effect
-# 
-# form_glm<-as.formula(paste(paste("states","~",paste(grep(colnames(train.data),pattern="SBS",value=T),collapse="+"))))
-# 
-# model_mes_epi<-glm(form_glm,train.data,family = "binomial")
-# step.model <- model_mes_epi %>% stepAIC(trace = TRUE)
-# 
-# update_sigs<-grep(names(which(summary(step.model)$coefficients[,4]<=0.05)),pattern="SBS",value=T)
-# 
-# form_glm<-as.formula(paste(paste("states","~",paste(update_sigs,collapse="+"))))
-# 
-# model_mes_epi<-glm(form_glm,train.data,family = "binomial")
-# 
-# require(sjPlot)
-# 
-# pdf("glm_sbs_mes_epi_notissue.pdf")
-# # plot_summs(step.model, scale = TRUE, inner_ci_level = .9,coefs=update_sigs)
-# p<-plot_model(model_mes_epi, vline.color = "red",transform = NULL,show.p = T,show.values = TRUE,terms=update_sigs)
-# print(p)
-# dev.off()
-
-# no tissue effect
-
-#
-# glm EPI-pEMT
-#
-# 
-# set.seed(123)
-# 
-# mat_temp<-mutsig_with_pseudotime3[,-2]
-# mat_temp<-mat_temp[mat_temp$states%in%c("pEMT","epi"),]
-# mat_temp$states<-as.factor(ifelse(mat_temp$states=="pEMT",1,0))
-# mat_temp$tumors<-as.factor(mat_temp$tumors)
-# 
-# training.samples <- mat_temp$states %>% createDataPartition(p = 0.7, list = FALSE)
-# 
-# train.data  <- mat_temp[training.samples, ]
-# test.data <- mat_temp[-training.samples, ]
-# 
-# # tissue effect
-# form_glm<-as.formula(paste(paste("states","~",paste(grep(colnames(train.data),pattern="SBS",value=T),collapse="+")),"+tumors"))
-# 
-# model_pemt_epi<-glm(form_glm,train.data,family = "binomial")
-# step.model <- model_pemt_epi %>% stepAIC(trace = TRUE)
-# 
-# update_sigs<-grep(names(summary(step.model)$coefficients[,4]),pattern="SBS",value=T)
-# 
-# form_glm<-as.formula(paste(paste("states","~",paste(update_sigs,collapse="+")),"+tumors"))
-# 
-# model_pemt_epi<-glm(form_glm,train.data,family = "binomial")
-# 
-# pdf("glm_sbs_pemt_epi.pdf")
-# p1<-plot_summs(step.model, scale = TRUE, inner_ci_level = .9,coefs=update_sigs)
-# print(p1)
-# p2<-plot_model(model_pemt_epi, vline.color = "red",transform = NULL,show.p = T,show.values = TRUE,terms=update_sigs)
-# print(p2)
-# dev.off()
-# 
-# # no tissue effect
-# form_glm<-as.formula(paste(paste("states","~",paste(grep(colnames(train.data),pattern="SBS",value=T),collapse="+"))))
-# 
-# model_pemt_epi<-glm(form_glm,train.data,family = "binomial")
-# step.model <- model_pemt_epi %>% stepAIC(trace = TRUE)
-# 
-# update_sigs<-grep(names(which(summary(step.model)$coefficients[,4]<=0.05)),pattern="SBS",value=T)
-# 
-# form_glm<-as.formula(paste(paste("states","~",paste(update_sigs,collapse="+"))))
-# 
-# model_pemt_epi<-glm(form_glm,train.data,family = "binomial")
-# 
-# pdf("glm_sbs_pemt_epi_notissue.pdf")
-# p1<-plot_summs(step.model, scale = TRUE, inner_ci_level = .9,coefs=update_sigs)
-# print(p1)
-# p2<-plot_model(model_pemt_epi, vline.color = "red",transform = NULL,show.p = T,show.values = TRUE,terms=update_sigs)
-# print(p2)
-# dev.off()
-
-#
-# Boxplot EMT scores vs mut sigs
-#
+setwd(output_dir)
 
 #
 # Filter2: Get only the columns in which the sum is greater than 0 (signals of mutational signatures)
@@ -577,8 +377,6 @@ p1<-ggplot(input_for_boxplot3_sorted_emt, aes(samples, score_emt))+  theme_bw()+
                                                                                     axis.ticks.x=element_blank())+ geom_hline(yintercept=0, linetype="dashed", color = "red")
 
 input_for_boxplot3_sorted_emt$sbs<-gsub(input_for_boxplot3_sorted_emt$sbs,pattern="SBS",replacement="")
-
-#https://stackoverflow.com/questions/23572660/ggplot2-continuous-colors-for-discrete-scale-and-delete-a-legend
 
 p2 <- ggplot(input_for_boxplot3_sorted_emt,aes(reorder(samples, score_emt, max),y=sbs,fill=sbs_freq))+
   geom_tile()+scale_fill_gradient2(low = "white", mid = "brown", high = "red", midpoint = 0.5)+theme_bw() + theme(legend.position="bottom",axis.title.x=element_blank(),
@@ -773,74 +571,3 @@ print(p+stat_compare_means(comparisons = my_comparisons,method="wilcox" ,label =
 dev.off()
 
 
-
-# pdf("emt_vs_sbs_v2.pdf",width=15)
-# 
-# p1 <- input_for_boxplot2 %>% ggplot(aes(x = sbs, y = score_emt, fill = sbs)) +  
-#   geom_boxplot() +
-#   geom_point(position = position_jitterdodge(jitter.width = 0),
-#              aes(color = factor(biological_states)), show.legend = TRUE)
-# p1
-# dev.off()
-
-
-# #
-# # Is the expression of the EPI/MES markers related with the mutational signatures?
-# #
-# setwd("/data/pseudospace/input_pseudospace")
-# load("TCGA_matrix_gene_expression_signals_ALLGENES_29_01_2020.RData")
-# 
-# setwd("/data/pseudospace/HMM")
-# markers_genes_read<-read.table(file="EMT_and_pEMT_markers.txt",header=T)
-# markers_genes<-markers_genes_read[,1]
-# 
-# TCGA_GEXP_ALL_rid<-TCGA_GEXP_ALL[TCGA_GEXP_ALL[,1]%in%markers_genes,]
-# colnames(TCGA_GEXP_ALL_rid)<-sapply(strsplit(as.character(colnames(TCGA_GEXP_ALL_rid)),split="\\."),FUN=function(X){paste(X[2:5],collapse="-")})
-# 
-# TCGA_GEXP_ALL_rid2<-t(TCGA_GEXP_ALL_rid[,-1])
-# colnames(TCGA_GEXP_ALL_rid2)<-TCGA_GEXP_ALL_rid[,1]
-# TCGA_GEXP_ALL_rid3<-data.frame(samples=rownames(TCGA_GEXP_ALL_rid2),log(TCGA_GEXP_ALL_rid2+1,2))
-# 
-# all_pvalues_genes_per_sbs<-data.frame()
-# 
-# setwd("/data/pseudospace/mutational_signature")
-# 
-# all_pvalues_genes_per_sbs<-data.frame()
-# 
-# for(g in colnames(TCGA_GEXP_ALL_rid3)[-1]){
-# 
-# 	current_genes_df<-TCGA_GEXP_ALL_rid3[,c("samples",g)]
-# 	current_genes_df_sigs<-merge(current_genes_df,mutsig_with_pseudotime2)
-# 	current_genes_df_sigs<-current_genes_df_sigs[order(current_genes_df_sigs$pseudospace,decreasing=T),]
-# 	form_lm<-as.formula(paste(paste(g,"~",paste(grep(colnames(mutsig_with_pseudotime2),pattern="SBS",value=T),collapse="+")),"+tumors"))
-# 	res_bygenes<-lm(form_lm,current_genes_df_sigs)
-# 	res_df_part<-data.frame(t(summary(res_bygenes)$coefficients[,1]))[,-1]
-# 	
-# 	all_pvalues_genes_per_sbs<-rbind(all_pvalues_genes_per_sbs,res_df_part)
-# }
-# 
-# all_pvalues_genes_per_sbs2<-all_pvalues_genes_per_sbs[,grep(colnames(all_pvalues_genes_per_sbs),pattern="SBS")]
-# 
-# rownames(all_pvalues_genes_per_sbs2)<- colnames(TCGA_GEXP_ALL_rid3)[-1]
-# 
-# all_pvalues_genes_per_sbs2_log<- all_pvalues_genes_per_sbs2
-# 
-# 
-# library(pheatmap)
-# 
-# setwd("/data/pseudospace/mutational_signature")
-# 
-# pdf(paste("All_groups","genes_signatures_pvalue.pdf",sep="."),width=15)
-# 
-# all_pvalues_genes_per_sbs2_log[is.na(all_pvalues_genes_per_sbs2_log)]<-0
-# 
-# ann_row<-markers_genes_read[match(rownames(all_pvalues_genes_per_sbs2_log),markers_genes_read[,1]),]
-# 
-# rownames(all_pvalues_genes_per_sbs2_log)<-ann_row[,1]
-# ann_row2<-data.frame(GeneType=as.factor(ann_row[,2]))
-# rownames(ann_row2)<-ann_row[,1]
-# 
-# pheatmap(all_pvalues_genes_per_sbs2_log,annotation_row=ann_row2)
-# 
-# dev.off()
-# 
