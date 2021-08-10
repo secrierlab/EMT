@@ -8,6 +8,15 @@ UCL Genetics Institute, Department of Genetics,  Evolution and Environment,  Uni
 
 # Table of contents
 
+## System Requirements
+Operating system(s): Platform Indipendent
+Programming Language: R
+
+## Installation
+Install R >= 3.6.1, available on https://cran.r-project.org/
+Install RStudio (Optional), available on https://www.rstudio.com/products/rstudio/download/
+An install file with the R-libraries to install and dependencies is provided (INSTALL.R). The user can copy and paste the following line on a R shell.
+
 ## ReconstructionEMTbulk
 This folder contains the code to reconstruct the EMT trajectory of the bulk RNA-seq data from TCGA
 - **projection_EMT_trajectory_MCF10A_to_TCGA.R:** main script to reconstruct the EMT trajectory of TCGA samples using as reference single-cell MCF10 data and their defined EMT pseudospace (trajectory). This script performs also several exploratory analysis. 
