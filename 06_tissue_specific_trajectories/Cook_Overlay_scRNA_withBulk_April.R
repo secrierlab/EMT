@@ -4,14 +4,21 @@ library(grid)
 library(readxl)
 library(plotrix)
 
-setwd("/data/pseudospace/explore_cook_sort_pseudotimes")
-load("COOK_branched_pseudotime.seurat.RData")
+folder_analysis<-getwd()
 
-load("/data/pseudospace/res_multiple_pseudospace/A549_mapped_seurat_correct_all_timecourse.RData")
+setwd('..')
+current_dir<-getwd()
+input_dir<-paste(current_dir,"/data",sep="")
+output_dir<-paste(current_dir,"/output_dir",sep="")
+
+# setwd(input_dir)
+# load("COOK_branched_pseudotime.seurat.RData")
+
+load("A549_mapped_seurat_correct_all_timecourse.RData")
 LUAD_scores_EMT<-df_scores_EMT
 LUAD_mapping<-res_mapping
 
-load("/data/pseudospace/res_multiple_pseudospace/MCF7_mapped_seurat_correct_all_timecourse.RData")
+load("MCF7_mapped_seurat_correct_all_timecourse.RData")
 BRCA_scores_EMT<-df_scores_EMT
 BRCA_mapping<-res_mapping
 
@@ -19,14 +26,16 @@ list_cellline<-c("A549","MCF7")
 list_tcga<-c("LUAD_mapping","BRCA_mapping")
 
 for(i in 1:length(list_cellline)){
-
+  
+  setwd(input_dir)
+  
   if(list_cellline[i]=="A549"){
     
-    clusters_df<-data.frame(read_excel("/data/pseudospace/explore_cook_sort_pseudotimes/find_drivers_events/LUAD_groups_for_Lucie.xlsx"))
+    clusters_df<-data.frame(read_excel("LUAD_groups_for_MultiTRJ.xlsx"))
   
   }else{
   
-    clusters_df<-data.frame(read_excel("/data/pseudospace/explore_cook_sort_pseudotimes/find_drivers_events/data_for_lucie_BRCA_PRAD_OV.xlsx","BRCA"))
+    clusters_df<-data.frame(read_excel("BRCA_PRAD_OV_groups_for_MultiTRJ.xlsx","BRCA"))
     
   }
   
@@ -47,29 +56,8 @@ for(i in 1:length(list_cellline)){
   tcga_pca<-cbind(current_tcga_pca[,which(colnames(current_tcga_pca)%in%c("x","y","clusters"))])
   colnames(tcga_pca)<-c("x","y","exp")
   
-  setwd("/data/pseudospace/explore_cook_sort_pseudotimes/find_drivers_events")
+  setwd(output_dir)
   
-  # all_data<-rbind(pca_res_cl,tcga_pca)
-  # all_data$exp<-as.factor(all_data$exp)
-  
-  # 
-  # # p<-ggplot(all_data, aes(x=x, y=y)) + geom_point(aes(color=exp)) +  scale_color_manual(values=c('#999999','#E69F00'))+theme_bw()
-  # 
-  # plot(x=all_data[,"x"],y=all_data[,"y"],col=c(rep('#999999',nrow(pca_res_cl)),rep('#E69F00',nrow(tcga_pca))))
-  # par(new=TRUE)
-  # lines(lineage_celline,col="midnightblue")
-  # 
-  # 
-  # 
-  # # plot(x=hbin@xcm,y=hbin@ycm,col=colors_to_use,pch=23,)
-  # # 
-  # # p<-gplot.hexbin(hbin)
-  # # pushHexport(p$plot.vp)
-  # # grid.points(tcga_pca[,"x"], tcga_pca[,"y"], gp=gpar(col="red"))
-  # # lines(lineage_celline,col="midnightblue",ylim=c(-3,3),xlim=c(-3,3.5))
-  # # 
-  # # plot(x=tcga_pca[,"x"],y=tcga_pca[,"y"],ylim=c(-3,3),xlim=c(-3,3.5),col='#E69F00')
-  # # upViewport()
   pdf(paste("TCGA_project_onto",lc,"pdf",sep="."))
   
   hexmap <- function(xcor,ycor,colval){

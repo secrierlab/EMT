@@ -4,6 +4,14 @@ library(ggplot2)
 library(RColorBrewer)
 library(ggpubr)
 library('biomaRt')
+
+folder_analysis<-getwd()
+
+setwd('..')
+current_dir<-getwd()
+input_dir<-paste(current_dir,"/data",sep="")
+output_dir<-paste(current_dir,"/output_dir",sep="")
+
 mart <- useDataset("hsapiens_gene_ensembl", useMart("ensembl"))
 
 setwd("/data/pseudospace/")
@@ -95,7 +103,7 @@ FisherByModule<-function(x,table_nsamples_for_state){
   
 }
 
-setwd("/data/pseudospace/")
+setwd(input_dir)
 
 load("HMM_nstates3_mock.mes.vs.epi.tissue.TRUE.1000.cosmic_arms_focal.RData")
 
@@ -116,36 +124,29 @@ mut_genes_mes_vs_mix_raw<-grep(markers_mes_vs_epi,pattern="dndscv",value=T)
 cnv_markers_mes_vs_mix<-sapply(strsplit(grep(sub(grep(markers_mes_vs_epi,pattern="dndscv",value=T,invert=T),pattern="^X",replacement=""),pattern="focal",value=T),split="_"),"[[",1)
 
 
-cosmic_table<-read.csv(file="/data/pseudospace/Census_allMon Aug 17 13_43_26 2020.csv",stringsAsFactors=F)
+cosmic_table<-read.csv(file="Census_allMon Aug 17 13_43_26 2020.csv",stringsAsFactors=F)
 cosmic_genes<-as.character(cosmic_table[,1])
 
 #
 # Read the data for the analysis
 #
 
-load("/data/pseudospace/A549_mapped_seurat_correct_all_timecourse.RData")
+load("A549_mapped_seurat_correct_all_timecourse.RData")
 LUAD_scores_EMT<-df_scores_EMT
 
-load("/data/pseudospace/MCF7_mapped_seurat_correct_all_timecourse.RData")
+load("MCF7_mapped_seurat_correct_all_timecourse.RData")
 BRCA_scores_EMT<-df_scores_EMT
 
 #
 # Read input files for the analysis
 #
 
-setwd("/data/pseudospace/find_drivers_events")
-
-LUAD_clusters <- read_excel("LUAD_groups_for_Lucie.xlsx")
-BRCA_clusters <- read_excel("data_for_lucie_BRCA_PRAD_OV.xlsx","BRCA")
+LUAD_clusters <- read_excel("LUAD_groups_for_MultiTRJ.xlsx")
+BRCA_clusters <- read_excel("BRCA_PRAD_OV_groups_for_MultiTRJ.xlsx","BRCA")
 
 LUAD_input<-merge(LUAD_clusters,LUAD_scores_EMT[,c(1:2)],by.x="Samples",by.y="Samples")
 BRCA_input<-merge(BRCA_clusters,BRCA_scores_EMT[,c(1:2)],by.x="Samples",by.y="Samples")
 
-#
-# Merge with hypoxia scores
-#
-load("/home/guidantoniomt/pseudospace/pathway_characterization/broad_genomic_features/PancancerHypoxia.RData")
-hypoxia_results_df2[,1]<-unlist(lapply(strsplit(gsub(hypoxia_results_df2[,1],pattern="\\.",replacement="-"),split="-"),FUN=function(X){paste(X[2:5],collapse="-")}))
 
 #
 # Create a list containing the experiments 
@@ -344,7 +345,7 @@ for(scexp in 1:length(list_input)){
     
   }
   
-  setwd("/data/pseudospace/")
+  setwd(ouput_dir)
   
   status<-names(RES_AMP_DEP)[cnv_events]
   
@@ -400,7 +401,7 @@ for(scexp in 1:length(list_input)){
                          pemt_vs_epi = cnv_markers_pemt_vs_epi,
                          mex_vs_mix = cnv_markers_mes_vs_mix))
   
-  setwd("/data/pseudospace/")
+  setwd(ouput_dir)
   
   output_pdf_venn<-paste("CNV_venn_for_clusters",current_cancer,".July.pdf",sep="")
   output_txt_venn<-paste("CNV_venn_for_clusters",current_cancer,".July.txt",sep="")

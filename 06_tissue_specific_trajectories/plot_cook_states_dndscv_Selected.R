@@ -6,20 +6,27 @@ library(ggplot2)
 library(ggpubr)
 library(RColorBrewer)
 
+folder_analysis<-getwd()
+
+setwd('..')
+current_dir<-getwd()
+input_dir<-paste(current_dir,"/data",sep="")
+output_dir<-paste(current_dir,"/output_dir",sep="")
+
 list_tum<-c("LUAD","BRCA")
 
 for(tum in list_tum){
   
-  setwd("/data/pseudospace/explore_cook_sort_pseudotimes/find_drivers_events")
+  setwd(input_dir)
   
   # Create a vector with the list of files to use, in order by state (1:5)
   files_current_tum<-paste(paste(tum,"dndscv_siggenes.0.1",1:5,sep="."),".txt",sep="")
   
   if(tum=="LUAD"){
     
-  clusters_df<-data.frame(read_excel("LUAD_groups_for_Lucie.xlsx"))
+  clusters_df<-data.frame(read_excel("LUAD_groups_for_MultiTRJ.xlsx"))
   
-  load("/data/pseudospace/res_multiple_pseudospace/A549_mapped_seurat_correct_all_timecourse.RData")
+  load("A549_mapped_seurat_correct_all_timecourse.RData")
   
   df_scores_EMT2<-df_scores_EMT[,c(1:2)]
   
@@ -33,9 +40,9 @@ for(tum in list_tum){
 
   }else{
     
-  clusters_df<-data.frame(read_excel("data_for_lucie_BRCA_PRAD_OV.xlsx","BRCA"))
+  clusters_df<-data.frame(read_excel("BRCA_PRAD_OV_groups_for_MultiTRJ.xlsx","BRCA"))
   
-  load("/data/pseudospace/res_multiple_pseudospace/MCF7_mapped_seurat_correct_all_timecourse.RData")
+  load("MCF7_mapped_seurat_correct_all_timecourse.RData")
   df_scores_EMT2<-df_scores_EMT[,c(1:2)]
   
   current_results<-merge(clusters_df,df_scores_EMT2,by.x="Samples",by.y="Samples")
@@ -115,13 +122,7 @@ for(tum in list_tum){
   percent_mut_for_cluster<-apply(freq_mut_for_cluster,1,FUN=function(X){X/sum(X)})
   percent_mut_for_genes<-apply(freq_mut_for_cluster,2,FUN=function(X){X/sum(X)})
   
-  #setwd("/data/pseudospace/explore_cook_sort_pseudotimes/find_drivers_events")
-  #write.table(freq_mut_for_cluster,file=paste(tum,"raw_nsamples_modules_genes.txt",sep="_"),row.names=T,sep="\t")
 
-  #check number of patients with mutations in one gene
-  #apply(freq_mut_for_cluster,2,sum)
-  #length(unique(mutect_file_snvs3[mutect_file_snvs3$Hugo_Symbol=="TP53",1]))
-  
   resFreq<-vector(mode="list",ncol(percent_mut_for_cluster))
   
   for(pcmut in 1:ncol(percent_mut_for_cluster)){
@@ -182,7 +183,7 @@ for(tum in list_tum){
   # links_genes[grep(links_genes$links_to_use,pattern="_0"),3]<-""
   # 
   # test5<-merge(test4,links_genes,by.x="genes",by.y="Detail")
-  setwd("/data/pseudospace/explore_cook_sort_pseudotimes/find_drivers_events")
+  setwd(ouput_dir)
   
   pdf(output_pdf)
   
@@ -201,7 +202,8 @@ for(tum in list_tum){
   dev.off()
   
   #Integrate with the gene-expression data
-  load("/data/pseudospace/input_pseudospace/TCGA_matrix_gene_expression_signals_ALLGENES_29_01_2020.RData")
+  setwd(input_dir)
+  load("TCGA_matrix_gene_expression_signals_ALLGENES_29_01_2020.RData")
 
   columns_to_use<-grep(colnames(TCGA_GEXP_ALL),pattern=tum,value=T)
   
@@ -210,12 +212,7 @@ for(tum in list_tum){
   matlog<-log(TCGA_GEXP_ALL_RID[,colnames(TCGA_GEXP_ALL_RID)%in%columns_to_use]+1,2)
   colnames(matlog)<-unlist(lapply(strsplit(gsub(colnames(matlog),pattern="\\.",replacement="-"),split="-"),FUN=function(X){paste(X[2:5],collapse="-")}))
 
-  #zscore<-function(x){(x-mean(x))/sd(x)}
 
-  #matlog_zscore<-t(apply(matlog,1,zscore))
-
-  #exp_matrix_tum<-data.frame(gene_symbol=TCGA_GEXP_ALL_RID[,1],matlog_zscore)
-  
   exp_matrix_tum<-data.frame(gene_symbol=TCGA_GEXP_ALL_RID[,1],matlog)
 
   exp_matrix_tum_melt<-melt(exp_matrix_tum)
