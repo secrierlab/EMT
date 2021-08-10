@@ -36,7 +36,7 @@ foo@bar:~$ sh download_data.sh
 2) Open RStudio or shell
 3) Move in the path with the script of interest as follow. 
 
-For example if the user wants to run the segmentation   (run_hmm.R) on a toy dataset of gene-expression (TCGA) these are the steps to use:
+For example if the user wants to run the segmentation (run_hmm.R) on a toy dataset of gene-expression (TCGA) these are the steps to use:
 
 ```r
 # Move in the directory in which there is a script
@@ -46,10 +46,14 @@ setwd("/Users/username/Desktop/EMT-main/02_HMM_macrostates_EMT")
 source("run_hmm.R")
 ```
 The example reported above employs less than 5 min to run on a normal laptop/desktop computer (2.4 GHz Quad-Core Intel Core i5, 8 GB 2133 MHz LPDDR3).
-The expected output file for this toy example are several charts (with the results of the segmentation) and tables. **Note:**, this is toy example, the biological assignments (e.g. pEMT) of the HMM states could be different respect the pan-cancer analysis. See material and methods for more details.
+The expected output file for this toy example are several charts (with the results of the segmentation) and tables. 
+
+**Note:**, this is toy example, the biological assignments (e.g. pEMT) of the HMM states could be different respect the pan-cancer analysis. See material and methods for more details.
+**Note:** change the string "EMT-main" to "EMT-EMTquant.v*.*", if you download the data from the "Releases" section (menu on the left of this page)
+
 
 **Notes:**: 
-- The scripts are able to upload the data (/data) they must to use automatically.
+- The scripts are able to upload the data (in the folder /data) that they must to use automatically.
 - All the output of the scripts are saved in the folder (output_dir) 
  
 ## ReconstructionEMTbulk
