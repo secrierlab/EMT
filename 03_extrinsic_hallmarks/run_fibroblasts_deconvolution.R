@@ -7,7 +7,14 @@ library(data.table)
 library(GSVA)
 library(parallel)
 
-setwd("/datamt/pseudospace/input_pseudospace")
+folder_analysis<-getwd()
+
+setwd('..')
+current_dir<-getwd()
+input_dir<-paste(current_dir,"/data",sep="")
+output_dir<-paste(current_dir,"/output_dir",sep="")
+
+setwd(input_dir)
 load("TCGA_matrix_gene_expression_signals_ALLGENES_29_01_2020.RData")
 tcga<-TCGA_GEXP_ALL
 tcga[,-1]<-log(tcga[,-1]+1,2)
@@ -16,24 +23,21 @@ tcga<-setDT(tcga)
 tcga2 <- data.frame(tcga[, lapply(.SD, mean), by = gene_symbol])
 rownames(tcga2)<-tcga2[,1]
 
-
-setwd("/datamt/pseudospace/pathway_characterization/fibroblast_analysis")
 fibro_catalog<-as.data.frame(read_excel("Fibroblast_catalog.xlsx",col_names=F))
 fibro_catalog_list <- split(fibro_catalog[,-c(1,2)], seq(nrow(fibro_catalog)))         # Convert rows to list
 fibro_catalog_list<-lapply(fibro_catalog_list,FUN=function(X){as.character(na.omit(as.character(X)))})
 names(fibro_catalog_list)<-fibro_catalog[,2]
 
-purity_data<-read.delim(file="/datamt/datasets/TCGA_supp/purity/TCGA_mastercalls.abs_tables_JSedit.fixed.txt",stringsAsFactors=F)
+purity_data<-read.delim(file="TCGA_mastercalls.abs_tables_JSedit.fixed.txt",stringsAsFactors=F)
 purity_data$samples<- unlist(lapply(strsplit(as.character(purity_data$sample),split="-"),FUN=function(X){paste(X[1:4],collapse="-")}))
 purity_data<-purity_data[-which(is.na(purity_data$purity)),]
 
-knn_df_tcga<-read.delim(file="/datamt/pseudospace/HMM/HMM_results_nstates_tumors_for_states3.withEMT.txt",stringsAsFactors=F)
+knn_df_tcga<-read.delim(file="HMM_results_nstates_tumors_for_states3.withEMT.txt",stringsAsFactors=F)
 knn_df_tcga$samples2<-knn_df_tcga$samples
 knn_df_tcga$samples<- unlist(lapply(strsplit(as.character(knn_df_tcga$samples),split="\\."),FUN=function(X){paste(X[2:5],collapse="-")}))
 
 emt_with_purity<-merge(knn_df_tcga,purity_data,by="samples")
 
-setwd("/datamt/pseudospace/pathway_characterization")
 
 emt_with_purity$states<-gsub(emt_with_purity$states,pattern=1,replacement="pEMT")
 emt_with_purity$states<-gsub(emt_with_purity$states,pattern=2,replacement="epi")
@@ -61,7 +65,7 @@ for(i in 1:length(list_cancers)){
   fibroblast_list_results[[i]]<-res
 }
 
-setwd("/datamt/pseudospace/pathway_characterization/fibroblast_analysis")
+setwd(output_dir)
 save(fibroblast_list_results,file="PancancerFibroblastTME.ssgsea.RData")
 
 #
@@ -219,7 +223,7 @@ idx_genes<-which(res_gain>thr)
 
 genes_to_save_FS<-rownames(res_gain)[idx_genes]
 
-setwd("/datamt/pseudospace/pathway_characterization/fibroblast_analysis")
+setwd(output_dir)
 
 mat_markers_fibroblast<-data.frame(sampleID=rownames(exp_markers_fibroblasts2),exp_markers_fibroblasts2)
 mat_markers_fibroblast2<-merge(knn_df_tcga,mat_markers_fibroblast,by.x="samples2",by.y="sampleID")
@@ -229,14 +233,6 @@ mat_markers_fibroblast2$states<-gsub(mat_markers_fibroblast2$states,pattern="2",
 mat_markers_fibroblast2$states<-gsub(mat_markers_fibroblast2$states,pattern="3",replacement="met")
 
 mat_markers_fibroblast2$states<-as.factor(mat_markers_fibroblast2$states)
-
-test<-melt(mat_markers_fibroblast2[,c(5:ncol(mat_markers_fibroblast2))])
-
-pdf("test.pdf")
-ggviolin(test, x = "states", y = "value", fill = "states",
-         palette = c("blue2", "orange2", "red2"),
-         add = "boxplot", add.params = list(fill = "white"))
-dev.off()
 
 col_fun = colorRamp2(c(min(knn_df_tcga$score_emt), 0, max(knn_df_tcga$score_emt)), c("deepskyblue3", "gainsboro", "darkorange2"))
 
@@ -290,7 +286,7 @@ res_aov_TME_df$padjust<-p.adjust(res_aov_TME_df[,6],"BH")
 
 aggregated_tme<-aggregate(value~states+variable,input_for_boxplot_fibroblast,mean)
 
-setwd("/datamt/pseudospace/pathway_characterization/fibroblast_analysis")
+setwd(output_dir)
 
 pdf("heatmap_TME_HMM_3_bytumor.ssgsea.Fibroblasts.pdf")
 aggregated_tme[which(aggregated_tme[,3]<0),3]<-0
@@ -331,7 +327,7 @@ remove_fibroblasts<-c("tumors","samples","samples2","LUNG","CRC","Breast_pCAF",
 
 library(nnet)
 
-setwd("/datamt/pseudospace/pathway_characterization/fibroblast_analysis")
+setwd(output_dir)
 
 ### Select train and test sets, dividing into 2/3 for train, 1/3 for test:
 set.seed(19875)
@@ -393,111 +389,8 @@ for(tmemn in 1:length(all_tme)){
     ylim(c(0,1))+
     ylab("Probability")+labs(title=all_tme[tmemn]) + geom_smooth(method = "lm",color="black")
   
-#  bpp3$tme_status<-rep(NULL,nrow(bpp3))
-  
-#  bpp3$tme_status<-ifelse(bpp3$tme>0,"High","Low")
-#  bpp3$tme_status<-factor(bpp3$tme_status, levels = c("Low", "High"))
-  
-#  my_comparisons <- list(c("High", "Low"))
-  
-#  pbox<-ggviolin(bpp3, x = "tme_status", y = "score_emt", fill = "tme_status",
-#                 palette = c("blue2","red2"),
-#                 add = "boxplot", add.params = list(fill = "white"))+stat_compare_means(comparisons = my_comparisons,method="wilcox" ,label = "p.signif")
-  
-#  bpp3$tme_status_prob<-rep(NULL,nrow(bpp3))
-#  bpp3[which(is.na(bpp3$Probability)),"Probability"]<-0
-#  bpp3$tme_status_prob<-ifelse(bpp3$Probability>=0.8,"High_Prob","Low_Prob")
-#  bpp3$tme_status_prob<-factor(bpp3$tme_status_prob, levels = c("High_Prob", "Low_Prob"))
-  
-#  bpp3$combined_states<- paste(bpp3$tme_status_prob,bpp3$tme_status,sep="-")
-#  bpp3$combined_states<-factor(bpp3$combined_states, levels = c("Low_Prob-Low", "Low_Prob-High","High_Prob-Low","High_Prob-High"))
-  
-#  if(length(which(is.na(bpp3$tme)))!=0){
-#    bpp3<-bpp3[-which(is.na(bpp3$tme)),]
-#  }else{
-#    bpp3<-bpp3
-#  }
-  
-#  my_comparisons<- list(c("Low_Prob-Low", "High_Prob-High"))
-  
-#  pbox2<-ggviolin(bpp3, x = "combined_states", y = "score_emt", fill = "combined_states",
-#                  add = "boxplot", add.params = list(fill = "white"))+stat_compare_means(comparisons = my_comparisons,method="wilcox" ,label = "p.signif")+facet_wrap(~Prediction,nrow=3,ncol=1)+stat_summary(fun.y=median, geom="line", aes(group=1))
-  
-#  my_comparisons <- list(c("epi", "mes"),c("epi", "pEMT"),c("pEMT", "mes"))
-  
-#  pbox3<-ggviolin(bpp3, x = "Prediction", y = "score_emt", fill = "Prediction",
-#                  add = "boxplot", add.params = list(fill = "white"))+stat_compare_means(comparisons = my_comparisons,method="wilcox" ,label = "p.signif")+facet_wrap(~combined_states,nrow=2)+stat_summary(fun.y=median, geom="line", aes(group=1))
-  
-#  bpp4<-bpp3[bpp3$combined_states %in% c("High_Prob-High","High_Prob-Low"),]
-#  bpp4$combined_states<-as.character(bpp4$combined_states)
-#  bpp4$combined_states<-as.factor(bpp4$combined_states)
-  
-#  bpp4<-bpp4[,c(1,2,3,7)]
-  
-#  my_comparisons<- list(c("High_Prob-Low", "High_Prob-High"))
-  
-#  library(ggpubr)
-#  library(rstatix)
-  
-#  idxzero<-which(table(as.character(bpp4$Prediction),bpp4$combined_states)==0)
-#  idxcol<-ncol(table(as.character(bpp4$Prediction),bpp4$combined_states))
-  
-#  if(length(idxzero)>=1 | idxcol == 1){
-    
-    # melt_check<-melt(table(bpp4$Prediction,bpp4$combined_states))
-    # emt_group<-melt_check[idxzero,1]
-    # group_prob<-as.character(melt_check[idxzero,2])
-    
-    # bpp5<-bpp4[-which(bpp4$combined_states%in%group_prob & bpp4$Prediction %in% emt_group ),]
-    
-#    status_stat<-"NO"
-#    bpp5<-bpp4
-    
-#  } else {
-    
-#    status_stat<-"YES"
-#    bpp5<-bpp4
-    
-#  }
-  
-#  if(status_stat!="NO"){
-    
-#    stat.test <- bpp5 %>% group_by(Prediction) %>% wilcox_test(score_emt ~ combined_states)
-    
-#    stat.test <- stat.test %>%
-#      add_xy_position(x = "Prediction", dodge = 0.8)
-    
-#    stat.test2 <- bpp4 %>%
-#      group_by(combined_states) %>%
-#      wilcox_test(score_emt ~ Prediction)
-    
-#    dfstats<-data.frame(stat.test2)[,c(1,3,4,8)]
-    
-#   stat.test2 <- stat.test2 %>%
-#      add_xy_position(x = "Prediction", dodge = 0.8)
-    
-#    pbox4<-ggviolin(bpp4, x = "Prediction", y = "score_emt", color = "combined_states",palette = c("#00AFBB", "#E7B800"),add = "boxplot", add.params = list(fill = "white"))+stat_pvalue_manual(stat.test,  label = "p", tip.length = 0)+geom_hline(yintercept=0, linetype="dashed")
-    
-#  }else{
-    
-#    pbox4<-ggviolin(bpp4, x = "Prediction", y = "score_emt", color = "combined_states",palette = c("#00AFBB", "#E7B800"),add = "boxplot", add.params = list(fill = "white"))+geom_hline(yintercept=0, linetype="dashed")
-    
-#  }
-  
-  #i am interested only in the samples that are High Prob and High and low TME
-#  ss <- tableGrob(dfstats)
-
 print(ptme)  
-#  ptme_box<-grid.arrange(ptme,pbox2,ncol=2,nrow=1,widths=c(8,3))
-  
-#  print(ptme_box)
-  
-#  print(pbox3)
-  
-#  ptme_box2<-grid.arrange(pbox4,ss,ncol=1,nrow=2)
-  
-#  print(ptme_box2)
-  
+
 }
 
 dev.off()

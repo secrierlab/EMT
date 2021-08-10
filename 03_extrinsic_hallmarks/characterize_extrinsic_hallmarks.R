@@ -11,7 +11,14 @@ library(jtools)
 # Compute hypoxia scores in my data
 #
 
-setwd("/data/pseudospace/input_pseudospace")
+folder_analysis<-getwd()
+
+setwd('..')
+current_dir<-getwd()
+input_dir<-paste(current_dir,"/data",sep="")
+output_dir<-paste(current_dir,"/output_dir",sep="")
+
+setwd(input_dir)
 load("TCGA_matrix_gene_expression_signals_ALLGENES_29_01_2020.RData")
 tcga<-TCGA_GEXP_ALL
 tcga[,-1]<-log(tcga[,-1]+1,2)
@@ -20,7 +27,6 @@ tcga<-setDT(tcga)
 tcga2 <- data.frame(tcga[, lapply(.SD, mean), by = gene_symbol])
 rownames(tcga2)<-tcga2[,1]
 
-setwd("/data/pseudospace/pathway_characterization/broad_genomic_features")
 hypoxia_catalog<-as.data.frame(read_excel("hypoxia_genes.xlsx",col_names=F))
 hypoxia_catalog_list <- split(hypoxia_catalog[,-c(1)], seq(nrow(hypoxia_catalog)))         # Convert rows to list
 hypoxia_catalog_list<-lapply(hypoxia_catalog_list,FUN=function(X){as.character(na.omit(as.character(X)))})
@@ -30,8 +36,7 @@ list_cancers<-unique(sapply(strsplit(colnames(tcga2)[-1],split="\\."),"[[",1))
 hypoxia_list_results<-vector(mode="list",length=length(list_cancers))
 names(hypoxia_list_results)<-list_cancers
 
-# Consider only the epithelial tumours for the analysis 
-knn_df_tcga<-read.delim(file="/data/pseudospace/HMM/HMM_results_nstates_tumors_for_states3.withEMT.txt")
+knn_df_tcga<-read.delim(file="HMM_results_nstates_tumors_for_states3.withEMT.txt")
 
 input_for_hypoxia_score<-as.matrix(tcga2[,-1])
 rownames(input_for_hypoxia_score)<-tcga2[,1]
@@ -40,7 +45,7 @@ rownames(input_for_hypoxia_score)<-tcga2[,1]
 input_for_hypoxia_score<-input_for_hypoxia_score[,colnames(input_for_hypoxia_score)%in%knn_df_tcga$samples]  
 
 #create an empty list in which stores the hypoxia scores
-  hypoxia_list_results<-vector(mode="list",length(hypoxia_catalog_list))
+hypoxia_list_results<-vector(mode="list",length(hypoxia_catalog_list))
   
 #for each signature
   for(hypox in 1:length(hypoxia_list_results)){
@@ -79,7 +84,7 @@ input_for_hypoxia_score<-input_for_hypoxia_score[,colnames(input_for_hypoxia_sco
   
   hypoxia_results_df2[,1]<-as.character(hypoxia_results_df2[,1])
 
-setwd("/data/pseudospace/pathway_characterization/broad_genomic_features")
+setwd(output_dir)
 save(hypoxia_results_df2,file="PancancerHypoxia.RData")
 
 colnames(hypoxia_results_df2)[1]<-"samples"
@@ -98,8 +103,8 @@ hypoxia_results_df2<-data.frame(hypoxia_results_df2 %>% dplyr::group_by(samples)
 #
 # Integrate the genomic data
 #
-
-knn_df_tcga<-read.delim(file="/data/pseudospace/HMM/HMM_results_nstates_tumors_for_states3.withEMT.txt")
+setwd(input_dir)
+knn_df_tcga<-read.delim(file="HMM_results_nstates_tumors_for_states3.withEMT.txt")
 knn_df_tcga$samples<- unlist(lapply(strsplit(as.character(knn_df_tcga$samples),split="\\."),FUN=function(X){paste(X[2:4],collapse="-")}))
 colnames(knn_df_tcga)[2]<-"samples"
 knn_df_tcga[,2]<-as.factor(knn_df_tcga[,2])
@@ -108,7 +113,8 @@ knn_df_tcga<-data.frame(knn_df_tcga %>% dplyr::group_by(samples) %>% dplyr::summ
                                                                                       states=unique(states)))
 
 # Load Aneuploidy data
-aneuploidy_tab<-read.delim(file="/data/datasets/TCGA/TCGA_supp/aneuploidy_score/aneuploidy_score_taylor_et_al2018.legacy.txt")[,c(1:13)]
+setwd(input_dir)
+aneuploidy_tab<-read.delim(file="aneuploidy_score_taylor_et_al2018.legacy.txt")[,c(1:13)]
 aneuploidy_tab$Sample<-unlist(lapply(strsplit(as.character(aneuploidy_tab$Sample),split="\\-"),FUN=function(X){paste(X[1:3],collapse="-")}))
 aneuploidy_tab<-aneuploidy_tab[,c(1,3,6,12,13)]
 colnames(aneuploidy_tab)[1]<-"samples"
@@ -122,14 +128,14 @@ aneuploidy_tab<-data.frame(aneuploidy_tab %>% dplyr::group_by(samples) %>% dplyr
 
 
 # Load Stemness data
-stemness_tab<-read.delim(file="/data/datasets/TCGA/TCGA_supp/stemness_scores/StemnessScores_RNAexp.txt")
+stemness_tab<-read.delim(file="StemnessScores_RNAexp.txt")
 stemness_tab$TCGAlong.id<-unlist(lapply(strsplit(as.character(stemness_tab$TCGAlong.id),split="\\-"),FUN=function(X){paste(X[1:3],collapse="-")}))
 colnames(stemness_tab)[1]<-"samples"
 stemness_tab[,1]<-as.factor(stemness_tab[,1])
 stemness_tab<-data.frame(stemness_tab %>% dplyr::group_by(samples) %>% dplyr::summarize(mRNAsi=mean(mRNAsi)))
 
 # Load CA20 data
-ca20_tab<-read.delim(file="/data/datasets/TCGA/TCGA_supp/ca20/journal.pcbi.1006832.s018.txt")
+ca20_tab<-read.delim(file="journal.pcbi.1006832.s018.txt")
 ca20_tab$Sample.ID<-gsub(ca20_tab$Sample.ID,pattern="\\.",replacement="-")
 ca20_tab$Sample.ID<-unlist(lapply(strsplit(as.character(ca20_tab$Sample.ID),split="\\-"),FUN=function(X){paste(X[1:3],collapse="-")}))
 colnames(ca20_tab)[1]<-"samples"
@@ -139,18 +145,13 @@ ca20_tab<-data.frame(ca20_tab %>% dplyr::group_by(samples) %>% dplyr::summarize(
 ca20_tab[,1]<-as.character(ca20_tab[,1])
 colnames(ca20_tab)[2]<-"CA20"
 
-# Load hypoxia data
-# hypoxia_tab<-read.delim(file="/data/datasets/TCGA/TCGA_supp/hypoxia_nature_genetics_bhandari_et_al_2019/hypoxia_pancancer.txt")
-# hypoxia_tab$patient_id<-gsub(hypoxia_tab$patient_id,pattern="\\.",replacement="-")
-# hypoxia_tab$patient_id<-unlist(lapply(strsplit(as.character(hypoxia_tab$patient_id),split="\\-"),FUN=function(X){paste(X[1:3],collapse="-")}))
-# colnames(hypoxia_tab)[1]<-"samples"
 
 # Load mut burden
-load("/data/pseudospace/pathway_characterization/broad_genomic_features/PancancerMB_HMM_emtstates.gsva.RData")
+load("PancancerMB_HMM_emtstates.gsva.RData")
 MUT_BURDEN_ALL$sample<-unlist(lapply(strsplit(as.character(MUT_BURDEN_ALL$sample),split="\\-"),FUN=function(X){paste(X[1:3],collapse="-")}))
 colnames(MUT_BURDEN_ALL)[2]<-"samples"
 
-setwd("/data/pseudospace/pathway_characterization/broad_genomic_features")
+setwd(output_dir)
 hypoxia_results_df2[,1]<-unlist(lapply(strsplit(as.character(hypoxia_results_df2$samples),split="\\."),FUN=function(X){paste(X[2:4],collapse="-")}))
 
 resOverlapSamples<-venndetail(list(samples_pseudospace = knn_df_tcga[,1], 
@@ -193,43 +194,8 @@ genomics_alterations_clean$states<-gsub(genomics_alterations_clean$states,patter
 
 genomics_alterations_clean$states<- factor(genomics_alterations_clean$states, levels = c("epi", "pEMT", "mes"))
 
-#
-# Principal component analysis
-#
-library("FactoMineR")
-library("factoextra")
 
-res.pca<-PCA(genomics_alterations_clean[which(genomics_alterations_clean$states%in%"epi"),c(1,3,4,5,6,7,8,9)],scale.unit=T,ncp =4)
-# res.pca$eig, get variables with top explained variance
-
-pdf("pca_epi_genomic_scores.pdf")
-corrplot(res.pca$var$cos2, is.corr=FALSE)
-corrplot(res.pca$var$contrib, is.corr=FALSE)
-pepi<-fviz_pca_var(res.pca, col.var = "cos2",
-             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"))
-print(pepi)
-dev.off()
-
-res.pca<-PCA(genomics_alterations_clean[which(genomics_alterations_clean$states%in%"pEMT"),c(1,3,4,5,6,7,8,9)],scale.unit=T,ncp=4)
-
-pdf("pca_pEMT_genomic_scores.pdf")
-corrplot(res.pca$var$cos2, is.corr=FALSE)
-corrplot(res.pca$var$contrib, is.corr=FALSE)
-pmix<-fviz_pca_var(res.pca, col.var = "cos2",
-             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"))
-print(pmix)
-dev.off()
-
-res.pca<-PCA(genomics_alterations_clean[which(genomics_alterations_clean$states%in%"mes"),c(1,3,4,5,6,7,8,9)],scale.unit=T,ncp=4)
-
-pdf("pca_MES_genomic_scores.pdf")
-corrplot(res.pca$var$cos2, is.corr=FALSE)
-corrplot(res.pca$var$contrib, is.corr=FALSE)
-pmes<-fviz_pca_var(res.pca, col.var = "cos2",
-             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"))
-print(pmes)
-dev.off()
-
+setwd(output_dir)
 
 #
 # Boxplot Aneuploidy
@@ -432,8 +398,8 @@ dev.off()
 #
 # What is the relation between the TME and hypoxia?
 #
-setwd("/data/pseudospace/pathway_characterization")
-load("PancancerTME.ssgsea.RData")
+setwd(input_dir)
+load("PancancerTME.RData")
 all_signatures<-unique(unlist(lapply(list_results,rownames)))
 all_samples<-sum(unlist(lapply(list_results,ncol)))
 
@@ -473,7 +439,7 @@ input_cor_tme_hypoxia<-merge(input_tme,input_hypoxia,by.x="samplesID",by.y="samp
 library(corrplot)
 library(RColorBrewer)
 
-setwd("/data/pseudospace/pathway_characterization/broad_genomic_features")
+setwd(output_dir)
 
 pdf("cor_TME_hypoxia.pdf",width=15,height=15)
 M <-cor(input_cor_tme_hypoxia[,-1],use="complete.obs")
@@ -513,7 +479,9 @@ dev.off()
 #  Do a model to explore the relation between multiple genomics features, TME and fibroblasts
 # 
 
-load("/data/pseudospace/pathway_characterization/fibroblast_analysis/PancancerFibroblastTME.ssgsea.RData")
+setwd(input_dir)
+
+load("PancancerFibroblastTME.ssgsea.RData")
 
 all_signatures<-unique(unlist(lapply(fibroblast_list_results,rownames)))
 all_samples<-sum(unlist(lapply(fibroblast_list_results,ncol)))
@@ -567,6 +535,8 @@ input_gf_tme_fb<-unique(merge(mat_genomics,
                        by="samplesID",
                        all.x=F,
                        all.y=F))
+
+setwd(output_dir)
 
 save(input_gf_tme_fb,file="aneuploidy_stem_hypo_TME_Fibroblasts_TCGA.RData")
 

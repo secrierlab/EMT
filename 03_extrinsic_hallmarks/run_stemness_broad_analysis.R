@@ -3,10 +3,17 @@ library(data.table)
 library(GSVA)
 library(corrplot)
 
+folder_analysis<-getwd()
+
+setwd('..')
+current_dir<-getwd()
+input_dir<-paste(current_dir,"/data",sep="")
+output_dir<-paste(current_dir,"/output_dir",sep="")
+
 #
 # Upload the TCGA data
 #
-setwd("/pseudospace/data")
+setwd(input_dir)
 load("TCGA_matrix_gene_expression_signals_ALLGENES_29_01_2020.RData")
 tcga<-TCGA_GEXP_ALL
 tcga[,-1]<-log(tcga[,-1]+1,2)
@@ -18,8 +25,6 @@ rownames(tcga2)<-tcga2[,1]
 #
 # upload the catalogue with the stemness markers
 #
-setwd("/pseudospace/data")
-
 stemness_catalog<-as.data.frame(read_excel("SuppStemnessCatalog.xlsx",col_names=F))
 stemness_catalog_list <- split(stemness_catalog[,-c(1,2)], seq(nrow(stemness_catalog)))
 stemness_catalog_list<-lapply(stemness_catalog_list,FUN=function(X){as.character(na.omit(as.character(X)))})
@@ -28,7 +33,7 @@ names(stemness_catalog_list)<-stemness_catalog[,2]
 #
 # upload segmentation data
 #
-knn_df_tcga<-read.delim(file="/home/guidantoniomt/pseudospace/HMM/HMM_results_nstates_tumors_for_states3.withEMT.txt",stringsAsFactors=F)
+knn_df_tcga<-read.delim(file="HMM_results_nstates_tumors_for_states3.withEMT.txt",stringsAsFactors=F)
 knn_df_tcga$samples2<-knn_df_tcga$samples
 knn_df_tcga$samples<- unlist(lapply(strsplit(as.character(knn_df_tcga$samples),split="\\."),FUN=function(X){paste(X[2:5],collapse="-")}))
 
@@ -39,7 +44,7 @@ knn_df_tcga$states<-gsub(knn_df_tcga$states,pattern=3,replacement="mes")
 knn_df_tcga$states<-as.factor(knn_df_tcga$states)
 knn_df_tcga$states<- factor(knn_df_tcga$states, levels = c("epi", "pEMT", "mes"))
 
-setwd("/pseudospace/data")
+setwd(output_dir)
 
 list_cancers<-unique(sapply(strsplit(colnames(tcga2)[-1],split="\\."),"[[",1))
 stemness_list_results<-vector(mode="list",length=length(list_cancers))
@@ -60,7 +65,7 @@ for(i in 1:length(list_cancers)){
   stemness_list_results[[i]]<-res
 }
 
-setwd("/pseudospace/data")
+setwd(output_dir)
 save(stemness_list_results,file="PancancerStemnessMarkers.ssgsea.RData")
 
 input_stemness<-data.frame(matrix(0,nrow=1,ncol=length(names(stemness_catalog_list))))
@@ -107,6 +112,8 @@ dev.off()
 #
 
 # add the data from Malta et al., with a pre-computed stemness score
+setwd(input_dir)
+
 stemness_tab<-read.delim(file="/home/guidantoniomt/datasets/TCGA/TCGA_supp/stemness_scores/StemnessScores_RNAexp.txt")
 stemness_tab$TCGAlong.id<-unlist(lapply(strsplit(as.character(stemness_tab$TCGAlong.id),split="\\-"),FUN=function(X){paste(X[1:4],collapse="-")}))
 colnames(stemness_tab)[1]<-"samples"
@@ -116,6 +123,8 @@ stemness_tab<-data.frame(stemness_tab %>% dplyr::group_by(samples) %>% dplyr::su
 stemness_full<-merge(matrix_pseudotime_stemness,stemness_tab,by.x="samples",by.y="samples")
 
 colnames(stemness_full)[6]<-"Miranda_et_al_PNAS"
+
+setwd(output_dir)
 
 pdf("comparisons_stemness_scores_for_states.pdf",height=10,width=10)
 
