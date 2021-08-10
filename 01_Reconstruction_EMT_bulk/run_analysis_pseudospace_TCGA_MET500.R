@@ -5,8 +5,12 @@ library(DESeq2)
 library(irlba)
 library(FNN)
 
+folder_analysis<-getwd()
 
-setwd('/data/pseudospace/')
+setwd('..')
+current_dir<-getwd()
+input_dir<-paste(current_dir,"/data",sep="")
+output_dir<-paste(current_dir,"/output_dir",sep="")
 
 norm_expr_data<-function(FM,pseudo_expr){
            
@@ -19,7 +23,9 @@ norm_expr_data<-function(FM,pseudo_expr){
 	return(FM2)
 }
 
-cds.list <- readRDS("/data/pseudospace/pseudospace_processed_trajectories_cds.list.rds")
+setwd(input_dir)
+
+cds.list <- readRDS("pseudospace_processed_trajectories_cds.list.rds")
 
 mock <- Biobase::exprs(cds.list[["Mock"]])
 tgfb <- Biobase::exprs(cds.list[["TGFB"]])
@@ -49,14 +55,10 @@ print(range(tgfb_norm2[,-c(1:2)]))
 # 
 # upload TCGA
 # 
-load('/data/pseudospace/TCGA_matrix_gene_expression_signals_ALLGENES_29_01_2020.RData')
+load('TCGA_matrix_gene_expression_signals_ALLGENES_29_01_2020.RData')
 
 # UPLOAD MET500 DATA-SET
-load('/data/pseudospace/MET500_rna_seq_log2_fpkm.ALLGENES.RData')
-
-# look here: https://www.biostars.org/p/273370/
-# and here: https://www.biostars.org/p/322114/
-# https://www.biostars.org/p/160989/
+load('MET500_rna_seq_log2_fpkm.ALLGENES.RData')
 
 met500_unlog<-2^met500_rnaseq2[,-c(1:2)]
 
@@ -134,6 +136,7 @@ vardata<-apply(combat_tgfb2[,-1],1,var)
 idx<-which(vardata>quantile(vardata)[4])
 combat_tgfb2_filter<-combat_tgfb2[idx,]
 
+setwd(output_dir)
 
 library(factoextra)
 
@@ -247,7 +250,7 @@ write.table(input_cp_final,file='KNN_projection_TCGA_MET500_to_MCF10A_treated_ce
 # 
 
 
-setwd("/home/guidantoniomt/pseudospace/HMM")
+setwd(input_dir)
 markers_genes_read<-read.table(file="EMT_and_pEMT_markers.txt",header=T)
 
 epi_genes<-intersect(input_ge[,1], markers_genes_read[markers_genes_read$status=="Epithelial_marker",1])
@@ -281,6 +284,7 @@ input_cp_final$patients<-as.character(input_cp_final$patients)
 
 input_cp_final2<-merge(x=input_cp_final[,-c(4:5)],y=df_emt_samples,by.x="patients",by.y="ID")
 
+setwd(output_dir)
 write.table(input_cp_final2,file='KNN_projection_TCGA_MET500_to_MCF10A_treated_cells_withEMT.txt',row.names=F,quote=F,sep='\t')
 
 input_cp_final2$new_ann<-rep("no",nrow(input_cp_final2))
@@ -296,7 +300,7 @@ library(ggplot2)
 library(ggridges)
 library(corrplot)
 
-setwd("/data/pseudospace")
+setwd(output_dir)
 
 pdf(paste("TCGA_MET500_pseudotime_vs_emt_scores_mock.pdf",sep="."),width=12,pointsize=12)
 p<-ggplot(input_cp_final2, 
@@ -319,7 +323,7 @@ dev.off()
 # Compare the EMT scores of the MET500 samples and the samples defined using HMM
 # 
 
-setwd("/data/pseudospace/HMM")
+setwd(input_dir)
 tab_hmm<-read.delim(file="HMM_results_nstates_3.txt",stringsAsFactors=F)
 samples_with_HMM_and_MET500<-merge(tab_hmm,input_cp_final2,by.x="samples",by.y="patients",all.x=T,all.y=T)
 samples_with_HMM_and_MET500$HMM_states[which(is.na(samples_with_HMM_and_MET500$HMM_states))]<-"MET500"
@@ -328,7 +332,8 @@ samples_with_HMM_and_MET500$HMM_states<-gsub(samples_with_HMM_and_MET500$HMM_sta
 samples_with_HMM_and_MET500$HMM_states<-gsub(samples_with_HMM_and_MET500$HMM_states,pattern="3",replacement="mes")
 samples_with_HMM_and_MET500$HMM_states<-factor(samples_with_HMM_and_MET500$HMM_states,levels=c("epi","pEMT","mes","MET500"))
 
-setwd("/data/pseudospace")
+setwd(output_dir)
+
 library(ggpubr)
 
 pdf("Compare_EMT_scores_primary_HMMstates_with_MET500.pdf")
@@ -348,7 +353,7 @@ dev.off()
 # Compare the pseudotime values for each category HMM
 # 
 
-setwd("/data/pseudospace/HMM")
+setwd(input_dir)
 tab_hmm_test<-read.delim(file="HMM_results_nstates_3.txt",stringsAsFactors=F)
 
 #tab_hmm_test$pseudospace<-max(tab_hmm_test$pseudospace)-tab_hmm_test$pseudospace
@@ -358,7 +363,7 @@ tab_hmm_test$pseudospace<-1-(tab_hmm_test$pseudospace/max(tab_hmm_test$pseudospa
 # Compare the hypoxia scores of the MET500 samples with the hypoxia scores of the TCGA samples
 # 
 
-setwd("/data/pseudospace/pseudospace")
+setwd(output_dir)
 
 pdf("Pseudotime_values_for_HMMstate.pdf")
 p<-ggviolin(tab_hmm_test,

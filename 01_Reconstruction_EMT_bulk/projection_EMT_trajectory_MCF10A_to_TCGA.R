@@ -5,15 +5,11 @@ library(DESeq2)
 library(irlba)
 library(FNN)
 
+
+
+setwd('/home/data/pseudospace/input_pseudospace')
+
 source('functions_plot_pseudospace.R')
-folder_analysis<-getwd()
-
-setwd('..')
-current_dir<-getwd()
-input_dir<-paste(current_dir,"/data",sep="")
-output_dir<-paste(current_dir,"/output_dir",sep="")
-
-setwd(input_dir)
 
 norm_expr_data<-function(FM,pseudo_expr){
            
@@ -25,7 +21,6 @@ norm_expr_data<-function(FM,pseudo_expr){
 	
 	return(FM2)
 }
-
 
 cds.list <- readRDS("pseudospace_processed_trajectories_cds.list.rds")
 
@@ -64,7 +59,7 @@ mock_norm2_gene<-merge(mock_norm2_gene,mock_pData,by.x='sample',by.y='cell')[,c(
 colnames(mock_norm2_gene)[1]<-'value'
 colnames(mock_norm2_gene)[2]<-'status'
 
-setwd(output_dir)
+setwd('/home/data/pseudospace/tcga_nocorrect_primary_tumors/23_04_2020_threegroups')
 
 png('MOCK_FN1_original_scRNA_seq.png', height=6,width=8,units='in',res=300)
 ggplot(mock_norm2_gene,aes(x=Pseudotime,y=value,color=status,shape=status))+geom_point(aes(alpha=0.9))+scale_color_manual(values=c('#E69F00','#56B4E9'))+geom_smooth(method='loess',fullrange=T,aes(linetype=status),color='black')
@@ -88,7 +83,7 @@ dev.off()
 # 
 # upload TCGA
 # 
-setwd(input_dir)
+setwd('/home/data/pseudospace/input_pseudospace')
 load('TCGA_matrix_gene_expression_signals_ALLGENES_29_01_2020.RData')
 
 tcga<-TCGA_GEXP_ALL
@@ -169,7 +164,7 @@ return(knn.list)
 			
 }
 
-setwd(output_dir)
+setwd('/home/data/pseudospace/tcga_nocorrect_primary_tumors/23_04_2020_threegroups')
 irlba_res <- prcomp(t(combat_mock_filter[,-1]))
 
 pdf('pca_mock.pdf',width=15)
@@ -281,7 +276,7 @@ for(patient in names(combat_tgfb2_tcga_knn)){
 tumors<-sapply(strsplit(names(combat_tgfb2_tcga_knn),split='\\.'),'[[',1)
 knn_df_tcga_tgfb<-data.frame(tumors=tumors,patients=names(combat_tgfb2_tcga_knn),pseudospace=knn_tgfb_pseudospace,ratio=ratio_tgfb_outer_inner,cor_tgfb=knn_tgfb_corr)
 
-setwd(output_dir)
+setwd('/home/data/pseudospace/tcga_nocorrect_primary_tumors/23_04_2020_threegroups')
 
 pdf("KNN_projection_TCGA_to_MCF10A_mock_treated_cells.pdf",height=15)
 # Generate plots of the density of projected HSNCC cells across pseudospace
@@ -311,7 +306,7 @@ ylab("Nearest Neighbor density across Pseudospace") +theme(text = element_text(s
 print(p)
 dev.off()
 
-setwd(output_dir)
+setwd('/home/data/pseudospace/tcga_nocorrect_primary_tumors/23_04_2020_threegroups')
 
 write.table(knn_df_tcga_tgfb,file='KNN_projection_TCGA_to_MCF10A_tgfb_treated_cells_no_correction_primarytumor.txt',row.names=F,quote=F,sep='\t')
 write.table(knn_df_tcga_mock,file='KNN_projection_TCGA_to_MCF10A_mock_treated_cells_no_correction_primarytumor.txt',row.names=F,quote=F,sep='\t')
@@ -323,7 +318,7 @@ input_cp<-data.frame(knn_df_tcga_mock,knn_df_tcga_tgfb[,c(3:5)])
 colnames(input_cp)[3:8]<-c('mock','mock_ratio','cor_mock','tgfb','tgfb_ratio','cor_tgfb')
 
 
-setwd(input_dir)
+setwd('/home/data/analysis_results')
 tab_clinical<-read.delim(file='clinical_table_TCGA_MET500_with_RECLASSIFICATION_withmedian.txt',stringsAsFactors=F)
 tab_clinical<-tab_clinical[tab_clinical$assay=='TCGA',]
 
@@ -346,11 +341,11 @@ input_cp<-merge(input_cp,sub_clinical2[,c(1,2)],by='patients')
 
 input_cp$tumor_stage<-as.factor(input_cp$tumor_stage)
 
-setwd(output_dir)
+setwd('/home/data/pseudospace/tcga_nocorrect_primary_tumors/23_04_2020_threegroups')
 
 save.image(file="KNN_projection_TCGA_to_MCF10A_no_correction_primarytumor.RData")
 
-setwd(output_dir)
+setwd('/home/data/pseudospace/tcga_nocorrect_primary_tumors/23_04_2020_threegroups')
 library(ggpubr)
 
 png('MOCK_correlation_TCGA_samples_with_scRNA_seq.png', height=6,width=15,units='in',res=300)
@@ -443,7 +438,7 @@ library(gridExtra)
 library(cluster)
 
 #source("/home/data/pseudospace/tcga_nocorrect_primary_tumors/explore_markers_in_pseudotime.R")
-source(paste(folder_analysis,"explore_markers_in_pseudotime_epithelial.R",sep="/"))
+source("/home/data/pseudospace/tcga_nocorrect_primary_tumors/explore_markers_in_pseudotime_epithelial.R")
 
 #
 # Save results PAM
@@ -456,14 +451,13 @@ input_cp_pemt$clusters2[which(input_cp_pemt$clusters==1)]<-"epithelial"
 input_cp_pemt$clusters2[which(input_cp_pemt$clusters==2)]<-"mixed"
 input_cp_pemt$clusters2[which(input_cp_pemt$clusters==3)]<-"Mesenchymal"
 
-setwd(output_dir)
 write.table(input_cp_pemt,file="proj_pseudospace_mcf_tgfb_mock_pam3_without_pemt.txt",quote=F,row.names=F,sep="\t")
 
 #
 # Save results mclust
 #
 
-source(paste(folder_analysis,"explore_markers_in_pseudotime_epithelial.R",sep="/"))
+source("/home/data/pseudospace/tcga_nocorrect_primary_tumors/explore_markers_in_pseudotime_epithelial_MClust.R")
 
 input_cp_pemt<-list_results_clusters_markers[["with_pemt"]]
 input_cp_pemt$clusters2<-rep("null",nrow(input_cp_pemt))

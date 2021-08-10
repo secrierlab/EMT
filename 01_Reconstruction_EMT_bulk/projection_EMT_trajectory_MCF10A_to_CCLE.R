@@ -28,7 +28,7 @@ norm_expr_data<-function(FM,pseudo_expr){
   return(FM2)
 }
 
-setwd('/data/')
+setwd('/home/data/pseudospace/input_pseudospace')
 
 cds.list <- readRDS("pseudospace_processed_trajectories_cds.list.rds")
 
@@ -47,12 +47,8 @@ mock_norm2 <- data.frame(mock2[,c(1:2)],mock_norm)
 # 
 # List of metastatic genes
 #
-setwd('..')
-current_dir<-getwd()
-input_dir<-paste(current_dir,"/data",sep="")
-output_dir<-paste(current_dir,"/output_dir",sep="")
 
-setwd(input_dir)
+setwd("/home/data/pseudospace/HMM")
 markers_genes_read<-read.table(file="EMT_and_pEMT_markers.txt",header=T)
 markers_genes<-markers_genes_read[,1]
 
@@ -60,19 +56,19 @@ markers_genes<-markers_genes_read[,1]
 # Read metmap data
 #
 
-brain_metmap500<-read.xlsx("MetMap500_met_potential.xlsx",sheet = 1)
+brain_metmap500<-read.xlsx("/home/data/pseudospace/CCLE/MetMap500_met_potential.xlsx",sheet = 1)
 colnames(brain_metmap500)[1]<-"cell_line"
 
-lung_metmap500<-read.xlsx("MetMap500_met_potential.xlsx",sheet = 2)
+lung_metmap500<-read.xlsx("/home/data/pseudospace/CCLE/MetMap500_met_potential.xlsx",sheet = 2)
 colnames(lung_metmap500)[1]<-"cell_line"
 
-liver_metmap500<-read.xlsx("MetMap500_met_potential.xlsx",sheet = 3)
+liver_metmap500<-read.xlsx("/home/data/pseudospace/CCLE/MetMap500_met_potential.xlsx",sheet = 3)
 colnames(liver_metmap500)[1]<-"cell_line"
 
-bone_metmap500<-read.xlsx("MetMap500_met_potential.xlsx",sheet = 4)
+bone_metmap500<-read.xlsx("/home/data/pseudospace/CCLE/MetMap500_met_potential.xlsx",sheet = 4)
 colnames(bone_metmap500)[1]<-"cell_line"
 
-kidney_metmap500<-read.xlsx("MetMap500_met_potential.xlsx",sheet = 5)
+kidney_metmap500<-read.xlsx("/home/data/pseudospace/CCLE/MetMap500_met_potential.xlsx",sheet = 5)
 colnames(kidney_metmap500)[1]<-"cell_line"
 
 met_potential_list<-vector(mode="list",length=5)
@@ -87,7 +83,7 @@ names(met_potential_list)<-c("brain","lung","liver","bone","kidney")
 # Analysis ccle
 #
 
-tab_input<-fread(file="CCLE_RNAseq_rsem_genes_tpm_20180929.txt",data.table=F)
+tab_input<-fread(file="/home/data/pseudospace/CCLE/CCLE_RNAseq_rsem_genes_tpm_20180929.txt",data.table=F)
 
 #
 # Step1: convert ensembl to gene-symbol
@@ -119,7 +115,7 @@ irlba_res <- prcomp(t(combined_MCF_ccle[,-c(1:2)]))
 #
 # PCA pre-combat
 #
-setwd(output_dir)
+setwd("/home/data/pseudospace/CCLE/")
 
 pdf('pca_MCF_ccle_nocombat.pdf')
 groups<-as.factor(c(rep("MCF",ncol(mock_norm2)-2),rep("CCLE",ncol(ccle_for_knn)-1)))
@@ -221,7 +217,7 @@ combat_MCF_ccle2_markers_melt2<-merge(combat_MCF_ccle2_markers_melt,pseudotimeCC
 
 combat_MCF_ccle2_markers_melt2$hgnc_symbol<-factor(combat_MCF_ccle2_markers_melt2$hgnc_symbol,levels=c("CDH1","CRB3","DSP","CDH2","FN1","VIM"))
 
-setwd("output_dir")
+setwd("/home/data/pseudospace/CCLE/")
 
 pdf("CCLE_EMT_markers_along_MCFtrajectory.pdf")
 
