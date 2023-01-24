@@ -69,13 +69,20 @@ The expected output file for this toy example are several charts (with the resul
 - The scripts are able to upload the data (in the folder /data) that they must to use automatically.
 - All the output of the scripts are saved in the folder (output_dir) 
  
-## ReconstructionEMTbulk
+# Reconstructing EMT using one or more single cell references
+
+**Defining the single cell EMT template**: We recommend that the single cell template should be adjusted based on the cancer type that is being studied. For instance, if you are studying breast cancer, you should use only the MCF10 and MCF7 single cell datasets as reference for EMT profiles. Conversely, if you are studying lung cancer, you should use only the A549 single cell datasets are reference. Additional single cell datasets that may be available to the user where a timeline of EMT transformation has been measured should be added to these existing reference datasets, or employed as a separate template if the user believes they more faithfully recapitulate the desired phenotypes. To adjust the templates, you just need to add these datasets when performing the analysis described in **projection_EMT_trajectory_MCF10A_to_TCGA.R** in the **ReconstructionEMTbulk** folder (here showcased for the MCF10 cell line, which can be replaced or supplemented accordingly).
+ 
+## 01_Reconstruction_EMT_bulk_singleReference
 This folder contains the code to reconstruct the EMT trajectory of the bulk RNA-seq data from TCGA
 - **projection_EMT_trajectory_MCF10A_to_TCGA.R:** main script to reconstruct the EMT trajectory of TCGA samples using as reference single-cell MCF10 data and their defined EMT pseudospace (trajectory). To adjust the single cell template, please see the section **Template adjustment based on cancer type** below. This script performs also several exploratory analysis. 
 - **run_analysis_pseudospace_TCGA_MET500.R:** procedure to quantify the EMT trajectory using TCGA and MET500 data
 - **projection_EMT_trajectory_MCF10A_to_CCLE.R:** main script to reconstruct the EMT trajectory of CCLE samples using as reference single-cell MCF10 data and their defined EMT pseudospace (trajectory). This script performs also several exploratory analysis. This script combine also EMT states with the information of the metastatic potential.
 - **knnForCCLE_MCF.R:** functions useful to run projection_EMT_trajectory_MCF10A_to_CCLE.R
 - **petalChartGMT.R:** functions useful to run projection_EMT_trajectory_MCF10A_to_CCLE.R
+
+## 01_Reconstruction_EMT_bulk_combinedReferences
+Similar to the code above, but using a consensus reference compiled from multiple single cell datasets. The bulk data are mapped separately to each single cell template as described above, and the inferred pseudotimes are afterwards averaged.
  
 
 ## HMM_macrostates_EMT
@@ -126,11 +133,6 @@ This folder contains the code to perform the validation using external datasets.
 - **CRISPR_validation_CNV.R:** Get the Ceres Scores of the biomarkers associated with copy number alterations and plot heatmaps
 - **validation_Schaller_MUT.R:** This script check if putative biomarkers of EMT with mutations are targets of TFs important for EMT
 - **validation_Schaller_CNV.R:** This script check if putative biomarkers of EMT associated with CNV are targets of TFs important for EMT
-
-
-## Template adjustment based on cancer type
-
-We recommend that the single cell template should be adjusted based on the cancer type that is being studied. For instance, if you are studying breast cancer, you should use only the MCF10 and MCF7 single cell datasets as reference for EMT profiles. Conversely, if you are studying lung cancer, you should use only the A549 single cell datasets are reference. Additional single cell datasets that may be available to the user where a timeline of EMT transformation has been measured should be added to these existing reference datasets, or employed as a separate template if the user believes they more faithfully recapitulate the desired phenotypes. To adjust the templates, you just need to add these datasets when performing the analysis described in **projection_EMT_trajectory_MCF10A_to_TCGA.R** in the **ReconstructionEMTbulk** folder (here showcased for the MCF10 cell line, which can be replaced or supplemented accordingly).
 
 
 # How to cite
