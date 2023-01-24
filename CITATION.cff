@@ -1,0 +1,14 @@
+cff-version: 1.5.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Malagoli Tagliazucchi"
+  given-names: "Guidantonio"
+- family-names: "Wiecek"
+  given-names: "Anna"
+- family-names: "Secrier"
+  given-names: "Maria"
+title: "EMT trajectory quantification in cancer"
+version: 1.5
+doi: 10.5281/zenodo.1234
+date-released: 2023-01-23
+url: "https://github.com/secrierlab/EMT"
