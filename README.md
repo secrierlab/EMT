@@ -127,9 +127,11 @@ This folder contains the code to perform the validation using external datasets.
 - **validation_Schaller_MUT.R:** This script check if putative biomarkers of EMT with mutations are targets of TFs important for EMT
 - **validation_Schaller_CNV.R:** This script check if putative biomarkers of EMT associated with CNV are targets of TFs important for EMT
 
+
 ## Template adjustment based on cancer type
 
-We recommend that the single cell template should be adjusted based on the cancer type that is being studied. For instance, if you are studying breast cancer, you should use only the MCF10 and MCF7 single cell datasets as reference for EMT profiles. Conversely, if you are studying lung cancer, you should use only the A549 single cell datasets are reference. Additional single cell datasets that may be available to the user where a timeline of EMT transformation has been measured should be added to these existing reference datasets, or employed as a separate template if the user believes they more faithfully recapitulate the desired phenotypes. To adjust the templates, you just need to add these datasets when performing the analysis described in projection_EMT_trajectory_MCF10A_to_TCGA.R in the ReconstructionEMTbulk folder (here showcased for the MCF10 cell line, which can be replaced or supplemented accordingly).
+We recommend that the single cell template should be adjusted based on the cancer type that is being studied. For instance, if you are studying breast cancer, you should use only the MCF10 and MCF7 single cell datasets as reference for EMT profiles. Conversely, if you are studying lung cancer, you should use only the A549 single cell datasets are reference. Additional single cell datasets that may be available to the user where a timeline of EMT transformation has been measured should be added to these existing reference datasets, or employed as a separate template if the user believes they more faithfully recapitulate the desired phenotypes. To adjust the templates, you just need to add these datasets when performing the analysis described in **projection_EMT_trajectory_MCF10A_to_TCGA.R** in the **ReconstructionEMTbulk** folder (here showcased for the MCF10 cell line, which can be replaced or supplemented accordingly).
+
 
 # How to cite
 At present, a version of this manuscript is available on bioarXiv: https://www.biorxiv.org/content/10.1101/2021.07.23.453584v1.
