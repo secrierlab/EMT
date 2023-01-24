@@ -145,7 +145,7 @@ This folder contains the code for the cell line and single cell analyses present
 
 
 # How to cite
-At present, a version of this manuscript is available on bioarXiv: https://www.biorxiv.org/content/10.1101/2021.07.23.453584v1.
+At present, a version of this manuscript is available on bioarXiv: https://www.biorxiv.org/content/10.1101/2021.07.23.453584v2.
 
 # Reference datasets
 
