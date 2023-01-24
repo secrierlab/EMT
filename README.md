@@ -1,5 +1,5 @@
 # Epithelial-to-mesenchymal trajectory quantification in cancer
-### Guidantonio Malagoli Tagliazucchi, Maria Secrier 
+### Authors: Guidantonio Malagoli Tagliazucchi, Anna Wiecek, Maria Secrier 
 UCL Genetics Institute, Department of Genetics,  Evolution and Environment,  University College London,  UK 
 
 <p align="center">
