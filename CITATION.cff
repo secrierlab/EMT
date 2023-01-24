@@ -4,10 +4,12 @@ authors:
 - family-names: "Malagoli Tagliazucchi"
   given-names: "Guidantonio"
 - family-names: "Wiecek"
-  given-names: "Anna"
+  given-names: "Anna J"
+- family-names: "Withnell"
+  given-names: "Eloise"
 - family-names: "Secrier"
   given-names: "Maria"
-title: "EMT trajectory quantification in cancer"
+title: "Genomic and microenvironmental heterogeneity shaping epithelial-to-mesenchymal trajectories in cancer"
 version: 1.5
 doi: 10.5281/zenodo.1234
 date-released: 2023-01-23
