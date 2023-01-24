@@ -1,0 +1,8 @@
+	all_sum
+LowPseudotime_tumour	912
+HighPseudotime_tumour	1459
+MidPseudotime_tumour	1205
+Stromal	1208
+Tcell	1013
+Bcell	697
+Myeloid	1417

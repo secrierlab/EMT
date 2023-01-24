@@ -1,0 +1,11 @@
+	all_sum
+DC	953
+T_cell	583
+HighPseudotime_tumour	311
+Myeloid	1126
+Fibroblast	1041
+EC	969
+B_cell	488
+MidPseudotime_tumour	178
+LowPseudotime_tumour	430
+Mast	437
