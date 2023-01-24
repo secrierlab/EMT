@@ -84,11 +84,15 @@ This folder contains the code to reconstruct the EMT trajectory of the bulk RNA-
 ## 01_Reconstruction_EMT_bulk_combinedReferences
 Similar to the code above, but using a consensus reference compiled from multiple single cell datasets. The bulk data are mapped separately to each single cell template as described above, and the inferred pseudotimes are afterwards averaged.
  
+ 
+# Macrostate inference
 
 ## HMM_macrostates_EMT
 This folder contains the code to perform the segmentation of the EMT trajectory and to identify the macrostates of EMT
 - **run_hmm.R:** This script contain the code to run the segmentation and perform the identification of the EMT states
 - **HMM_noise.R:** This script implements a procedure to add noise (through the jitter function) in the original datasets and quantify the robustness of the HMM states 
+
+# Hallmarks, modelling and validation 
   
 ## extrinsic_hallmarks
 This folder contains the code to quantify the extrinsic hallmarks of EMT
@@ -133,6 +137,11 @@ This folder contains the code to perform the validation using external datasets.
 - **CRISPR_validation_CNV.R:** Get the Ceres Scores of the biomarkers associated with copy number alterations and plot heatmaps
 - **validation_Schaller_MUT.R:** This script check if putative biomarkers of EMT with mutations are targets of TFs important for EMT
 - **validation_Schaller_CNV.R:** This script check if putative biomarkers of EMT associated with CNV are targets of TFs important for EMT
+
+# Single cell and cell line EMT analyses
+
+## ScRNAseq_analysis
+This folder contains the code for the cell line and single cell analyses presented in the manuscript, with analysis exemplified for the breast cancer cohort from Qian et al.
 
 
 # How to cite
